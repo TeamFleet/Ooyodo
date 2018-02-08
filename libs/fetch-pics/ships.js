@@ -34,9 +34,9 @@ const dirFetchedData = pathname.fetchedData
  * 每下载一个舰娘的图片后会执行的回调函数
  * @callback onProgressCallback
  * @param {Object} obj
- * @param {Object} obj.currentShip - 当前完成的舰娘的元数据
- * @param {number} obj.currentShipIndex - 当前完成的舰娘的index
- * @param {number} obj.shipsCount - 有效的舰娘总数
+ * @param {Object} obj.ship - 当前完成的舰娘的元数据
+ * @param {number} obj.index - 当前完成的index
+ * @param {number} obj.length - 有效总数
  */
 module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject) => {
     const dirPicsShips = path.join(dirFetchedData, 'pics', 'ships')
@@ -79,7 +79,7 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
     let map = {} // 舰娘和加密URL的对应
     let needUpdate = [] // 需要更新的舰娘
     let picsVersionsNew = {}
-    let shipsCount = 0
+    // let shipsCount = 0
     let completeIndex = 0
 
     /* data examples
@@ -226,7 +226,7 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
         if (rawShips[i].api_name !== 'なし') {
             ships[rawShips[i].api_id] = rawShips[i]
             map[rawShips[i].api_id] = null
-            shipsCount++
+            // shipsCount++
         }
     }
 
@@ -332,9 +332,9 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
 
             if (typeof onProgress === 'function')
                 onProgress({
-                    currentShip: ship,
-                    currentShipIndex: completeIndex,
-                    shipsCount: needUpdate.length
+                    ship: ship,
+                    index: completeIndex,
+                    length: needUpdate.length
                 })
 
             completeIndex++

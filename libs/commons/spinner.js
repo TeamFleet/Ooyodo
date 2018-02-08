@@ -1,10 +1,13 @@
 const ora = require('ora')
+const {
+    spinner
+} = require('../vars')
 
 module.exports = (options = {}) => {
     const waiting = ora(
         Object.assign(
             {
-                spinner: 'dots',
+                spinner,
                 color: 'cyan'
             },
             typeof options === 'string' ? {

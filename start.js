@@ -5,12 +5,63 @@ const path = require('path')
 const ProgressBar = require('progress')
 
 const {
+    spinner: spinnerObj,
     pathname,
 } = require('./libs/vars')
 const spinner = require('./libs/commons/spinner')
 
 const strPaddingLength = 50
 const strPaddingStr = '─'
+
+const download = async (title, run) => {
+    const step = title
+    const waiting = spinner(step)
+
+    let bar
+    let interval
+    let currentFrame = 0
+
+    const symbolTicking = () => {
+        let symbol = '\x1b[36m' + spinnerObj.frames[currentFrame] + '\x1b[0m'
+        bar.tick(0, {
+            symbol
+        })
+        currentFrame++
+        if (currentFrame > spinnerObj.frames.length - 1)
+            currentFrame = 0
+    }
+    await run(({
+        // ship,
+        // index,
+        length
+    }) => {
+        // console.log(currentShipIndex, shipsCount)
+        if (!bar) {
+            waiting.stop()
+            bar = new ProgressBar(
+                `:symbol ${step} [:bar] :current / :total`,
+                {
+                    total: length,
+                    width: 20,
+                    complete: '■',
+                    incomplete: '─',
+                    clear: true
+                }
+            )
+            symbolTicking()
+            interval = setInterval(symbolTicking, spinnerObj.interval)
+        }
+        bar.tick()
+    })
+        .then(() => {
+            waiting.stop()
+            clearInterval(interval)
+            spinner(step).finish()
+        })
+        .catch(err =>
+            waiting.fail(step + '\n  ' + (err.message || err))
+        )
+}
 
 const run = async () => {
     let token
@@ -114,45 +165,20 @@ const run = async () => {
      * 下载舰娘图片
      ***********************************************/
     {
-        const step = '下载舰娘图片'
-        const waiting = spinner(step)
-        const run = require('./libs/fetch-pics/ships')
-        let bar
-        await run(({
-            // currentShip,
-            // currentShipIndex,
-            shipsCount
-        }) => {
-            // console.log(currentShipIndex, shipsCount)
-            if (!bar) {
-                waiting.stop()
-                bar = new ProgressBar(
-                    `  ${step} [:bar] :current / :total`,
-                    {
-                        total: shipsCount,
-                        width: 20,
-                        complete: '■',
-                        incomplete: '─',
-                        clear: true
-                    }
-                )
-            }
-            bar.tick()
-        })
-            .then(() => {
-                waiting.stop()
-                spinner(step).finish()
-            })
-            .catch(err =>
-                waiting.fail(step + '\n  ' + (err.message || err))
-            )
+        await download(
+            '下载舰娘图片',
+            require('./libs/fetch-pics/ships')
+        )
     }
 
     /************************************************
      * 下载装备图片
      ***********************************************/
     {
-
+        await download(
+            '下载装备图片',
+            require('./libs/fetch-pics/equipments')
+        )
     }
 
     /************************************************
@@ -190,7 +216,8 @@ const run = async () => {
 
     }
 
-    console.log(`√ Finished!`)
+    console.log('')
+    console.log('\x1b[36m' + '完成!' + '\x1b[0m')
     console.log('')
     console.log(''.padEnd(strPaddingLength, strPaddingStr))
 }

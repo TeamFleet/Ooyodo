@@ -1,6 +1,9 @@
 const path = require('path')
+const spinners = require('cli-spinners')
 
 module.exports = {
+    spinner: spinners.dots,
+
     enemyIdStartFrom: 1501,
     enemyEquipmentIdStartFrom: 501,
 

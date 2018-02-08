@@ -1,7 +1,7 @@
-const path = require('path')
+// const path = require('path')
 const url = require('url')
 const request = require('request')
-const fs = require('fs-extra')
+// const fs = require('fs-extra')
 
 /**
  * 获取游戏API: api_start2
