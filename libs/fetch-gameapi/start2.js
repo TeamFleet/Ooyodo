@@ -23,7 +23,7 @@ const run = (options) =>
         const api_token = _api_token || _token
 
         if (!api_token)
-            return reject('No api_token found! Terminated.')
+            return reject('未提供 api_token!')
 
         new Promise((resolve, reject) => {
             request({

@@ -2,6 +2,7 @@
 const argv = require('yargs').argv
 const fs = require('fs-extra')
 const path = require('path')
+const ProgressBar = require('progress')
 
 const {
     pathname,
@@ -74,14 +75,14 @@ const run = async () => {
      * 检查api_start2.json
      ***********************************************/
     if (!fs.existsSync(pathname.apiStart2)) {
-        console.log('❌  Aborted! '.padEnd(strPaddingLength, strPaddingStr))
+        console.log('❌  终止! '.padEnd(strPaddingLength, strPaddingStr))
         console.log('')
 
         if (!token) {
-            console.log('Please type valid command:')
+            console.log('请输入正确的命令')
             console.log('npm start -- [token]')
         } else {
-            console.log('api_start2 fetch error!')
+            console.log('获取 api_start2 发生错误!')
         }
 
         console.log('')
@@ -98,17 +99,11 @@ const run = async () => {
         const run = async type => {
             const thisStep = step + ` (${type})`
             const waiting = spinner(thisStep)
-            const run = require('./libs/commons/prepare-repo-dir')
-            return run(type)
-                .then(() => {
-                    waiting.finish()
-                })
-                .catch(err => {
-                    let msg = err
-                    if (err && err.message)
-                        msg = err.message
-                    waiting.fail(thisStep + '\n  ' + msg)
-                })
+            return require('./libs/commons/prepare-repo-dir')(type)
+                .then(() => waiting.finish())
+                .catch(err =>
+                    waiting.fail(thisStep + '\n  ' + (err.message || err))
+                )
         }
 
         await run('database')
@@ -119,7 +114,38 @@ const run = async () => {
      * 下载舰娘图片
      ***********************************************/
     {
-
+        const step = '下载舰娘图片'
+        const waiting = spinner(step)
+        const run = require('./libs/fetch-pics/ships')
+        let bar
+        await run(({
+            // currentShip,
+            // currentShipIndex,
+            shipsCount
+        }) => {
+            // console.log(currentShipIndex, shipsCount)
+            if (!bar) {
+                waiting.stop()
+                bar = new ProgressBar(
+                    `  ${step} [:bar] :current / :total`,
+                    {
+                        total: shipsCount,
+                        width: 20,
+                        complete: '■',
+                        incomplete: '─',
+                        clear: true
+                    }
+                )
+            }
+            bar.tick()
+        })
+            .then(() => {
+                waiting.stop()
+                spinner(step).finish()
+            })
+            .catch(err =>
+                waiting.fail(step + '\n  ' + (err.message || err))
+            )
     }
 
     /************************************************
@@ -145,6 +171,13 @@ const run = async () => {
 
     /************************************************
      * 复制所有新图片到pics代码库
+     ***********************************************/
+    {
+
+    }
+
+    /************************************************
+     * pics代码库执行start
      ***********************************************/
     {
 

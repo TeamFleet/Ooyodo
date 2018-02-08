@@ -14,10 +14,10 @@ module.exports = (options = {}) => {
     ).start()
 
     waiting.finish = (options = {}) => {
-        waiting.color = 'green'
         waiting.stopAndPersist(Object.assign({
-            symbol: '√'
+            symbol: '\x1b[32m' + '√' + '\x1b[0m'
         }, options))
+        // waiting.color = 'green'
     }
 
     return waiting

@@ -25,7 +25,7 @@
         "fs-extra": "^5.0.0",
         "request": "^2.83.0",
         "nedb-promise": "^2.0.1",
-        "jpexs-flash-decompiler": "^0.0.4",
+        "jpexs-flash-decompiler": "Diablohu/jpexs-flash-decompiler",
         "ora": "^1.4.0",
         "progress": "^2.0.0",
         "yargs": "^11.0.0",

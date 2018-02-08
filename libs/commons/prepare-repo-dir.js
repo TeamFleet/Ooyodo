@@ -19,7 +19,7 @@ module.exports = async type => new Promise(async (resolve, reject) => {
     if (type == 'db') type = 'database'
 
     if (!(type in repos))
-        return reject(new Error('Please type correct repo type'))
+        return reject(new Error('请输入正确的代码库类型'))
 
     const dir = pathname[`repo` + type.substr(0, 1).toUpperCase() + type.substr(1)]
     const repoURL = repos[type]
