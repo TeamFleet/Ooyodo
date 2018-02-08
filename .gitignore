@@ -57,3 +57,7 @@ typings/
 # dotenv environment variables file
 .env
 
+# 项目内容
+/.fetched_data
+/.repo_database
+/.repo_pics

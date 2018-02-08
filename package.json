@@ -16,6 +16,7 @@
     },
 
     "scripts": {
+        "start": "node start.js"
     },
 
     "dependencies": {
@@ -26,7 +27,9 @@
         "nedb-promise": "^2.0.1",
         "jpexs-flash-decompiler": "^0.0.4",
         "ora": "^1.4.0",
-        "progress": "^2.0.0"
+        "progress": "^2.0.0",
+        "yargs": "^11.0.0",
+        "simple-git": "^1.89.0"
     },
 
     "devDependencies": {
