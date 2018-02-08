@@ -8,10 +8,10 @@ module.exports = {
     enemyEquipmentIdStartFrom: 501,
 
     pathname: {
-        fetchedData: path.resolve(__dirname, '../.fetched_data'),
-        repoPics: path.resolve(__dirname, '../.repo_pics'),
-        repoDatabase: path.resolve(__dirname, '../.repo_database'),
+        fetchedData: path.resolve(process.cwd(), './.fetched_data'),
+        repoPics: path.resolve(process.cwd(), './.repo_pics'),
+        repoDatabase: path.resolve(process.cwd(), './.repo_database'),
 
-        apiStart2: path.resolve(__dirname, '../.fetched_data/api_start2.json')
+        apiStart2: path.resolve(process.cwd(), './.fetched_data/api_start2.json')
     },
 }
