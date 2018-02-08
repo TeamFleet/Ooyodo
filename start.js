@@ -3,15 +3,16 @@ const argv = require('yargs').argv
 const fs = require('fs-extra')
 const path = require('path')
 
-const vars = require('./libs/vars')
+const {
+    pathname,
+} = require('./libs/vars')
 const spinner = require('./libs/commons/spinner')
 
 const strPaddingLength = 50
 const strPaddingStr = '─'
 
 const run = async () => {
-    let token, dir
-    const files = {}
+    let token
 
     { // 确定访问DMM的token
         if (argv.token)
@@ -31,10 +32,7 @@ const run = async () => {
      * 确保内容存储目录和相关文件路径
      ***********************************************/
     {
-        dir = path.join(__dirname, vars.pathFetchedData)
-        fs.ensureDirSync(dir)
-
-        files.apiStart2 = path.resolve(dir, `api_start2.json`)
+        fs.ensureDirSync(pathname.fetchedData)
     }
 
     /************************************************
@@ -44,15 +42,15 @@ const run = async () => {
         console.log(`√ Token: ${token}`)
 
         const step = '获取游戏API - start2'
-        const run = require('./libs/fetch-gameapi/start2')
         const waiting = spinner(step)
+        const run = require('./libs/fetch-gameapi/start2')
 
         await run({
             token
         })
             .then(data => {
                 fs.writeFileSync(
-                    path.join(files.apiStart2),
+                    path.join(pathname.apiStart2),
                     JSON.stringify(data, undefined, 4)
                 )
                 waiting.finish()
@@ -75,7 +73,7 @@ const run = async () => {
     /************************************************
      * 检查api_start2.json
      ***********************************************/
-    if (!fs.existsSync(files.apiStart2)) {
+    if (!fs.existsSync(pathname.apiStart2)) {
         console.log('❌  Aborted! '.padEnd(strPaddingLength, strPaddingStr))
         console.log('')
 
@@ -95,7 +93,26 @@ const run = async () => {
      * 准备pics和database代码库
      ***********************************************/
     {
+        const step = '准备代码库'
 
+        const run = async type => {
+            const thisStep = step + ` (${type})`
+            const waiting = spinner(thisStep)
+            const run = require('./libs/commons/prepare-repo-dir')
+            return run(type)
+                .then(() => {
+                    waiting.finish()
+                })
+                .catch(err => {
+                    let msg = err
+                    if (err && err.message)
+                        msg = err.message
+                    waiting.fail(thisStep + '\n  ' + msg)
+                })
+        }
+
+        await run('database')
+        await run('pics')
     }
 
     /************************************************
@@ -109,35 +126,35 @@ const run = async () => {
      * 下载装备图片
      ***********************************************/
     {
-        
+
     }
 
     /************************************************
      * 初始化database
      ***********************************************/
     {
-        
+
     }
 
     /************************************************
      * 比对所有舰娘图片和已有图片，选择出新的图片
      ***********************************************/
     {
-        
+
     }
 
     /************************************************
      * 复制所有新图片到pics代码库
      ***********************************************/
     {
-        
+
     }
 
     /************************************************
      * 更新database
      ***********************************************/
     {
-        
+
     }
 
     console.log(`√ Finished!`)
