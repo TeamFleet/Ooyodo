@@ -2,66 +2,17 @@
 const argv = require('yargs').argv
 const fs = require('fs-extra')
 const path = require('path')
-const ProgressBar = require('progress')
 
 const {
-    spinner: spinnerObj,
     pathname,
 } = require('./libs/vars')
 const spinner = require('./libs/commons/spinner')
+const download = require('./libs/commons/download')
 
 const strPaddingLength = 50
 const strPaddingStr = '─'
 
-const download = async (title, run) => {
-    const step = title
-    const waiting = spinner(step)
-
-    let bar
-    let interval
-    let currentFrame = 0
-
-    const symbolTicking = () => {
-        let symbol = '\x1b[36m' + spinnerObj.frames[currentFrame] + '\x1b[0m'
-        bar.tick(0, {
-            symbol
-        })
-        currentFrame++
-        if (currentFrame > spinnerObj.frames.length - 1)
-            currentFrame = 0
-    }
-    await run(({
-        // ship,
-        // index,
-        length
-    }) => {
-        // console.log(currentShipIndex, shipsCount)
-        if (!bar) {
-            waiting.stop()
-            bar = new ProgressBar(
-                `:symbol ${step} [:bar] :current / :total`,
-                {
-                    total: length,
-                    width: 20,
-                    complete: '■',
-                    incomplete: '─',
-                    clear: true
-                }
-            )
-            symbolTicking()
-            interval = setInterval(symbolTicking, spinnerObj.interval)
-        }
-        bar.tick()
-    })
-        .then(() => {
-            waiting.stop()
-            clearInterval(interval)
-            spinner(step).finish()
-        })
-        .catch(err =>
-            waiting.fail(step + '\n  ' + (err.message || err))
-        )
-}
+const logWIP = str => console.log('\x1b[31m' + '× \x1b[91m[WIP] \x1b[0m' + str)
 
 const run = async () => {
     let token
@@ -185,35 +136,42 @@ const run = async () => {
      * 初始化database
      ***********************************************/
     {
-
+        logWIP('初始化database')
     }
 
     /************************************************
-     * 比对所有舰娘图片和已有图片，选择出新的图片
+     * 比对下载的舰娘图片和已有图片，选择出新的图片
      ***********************************************/
     {
+        logWIP('比对下载的舰娘图片和已有图片，选择出新的图片')
+    }
 
+    /************************************************
+     * 比对下载的装备图片和已有图片，选择出新的图片
+     ***********************************************/
+    {
+        logWIP('比对下载的装备图片和已有图片，选择出新的图片')
     }
 
     /************************************************
      * 复制所有新图片到pics代码库
      ***********************************************/
     {
-
+        logWIP('复制所有新图片到pics代码库')
     }
 
     /************************************************
      * pics代码库执行start
      ***********************************************/
     {
-
+        logWIP('pics代码库执行start')
     }
 
     /************************************************
      * 更新database
      ***********************************************/
     {
-
+        logWIP('更新database')
     }
 
     console.log('')

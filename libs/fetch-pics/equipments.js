@@ -63,12 +63,9 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
         typeof apiStart2.api_data.api_mst_slotitem !== 'object') {
         return reject('api_start2.json 已损坏，请提供 token 以重新下载')
     }
-    const {
+    let {
         api_mst_slotitem: slotitem,
     } = apiStart2.api_data
-
-    let completeIndex = 0
-    let length = slotitem.length
 
     const pics = [
         'card',
@@ -78,21 +75,29 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
         'statustop_item'
     ]
 
+    slotitem = slotitem.filter(obj => {
+        const id = parseInt(obj.api_id)
+        if (id >= enemyEquipmentIdStartFrom) {
+            return false
+        }
+        const dir = path.join(dirPicsEquipments, '' + id)
+        if (fs.existsSync(dir)) {
+            // console.log(`  │       EXIST [${id}] ${name}`)
+            return false
+        }
+        return true
+    })
+
+    let completeIndex = 0
+    let length = slotitem.length
+
     for (let obj of slotitem) {
         const id = parseInt(obj.api_id)
-        if (id >= enemyEquipmentIdStartFrom) continue
-
         // const name = obj.api_name
         const dir = path.join(dirPicsEquipments, '' + id)
 
-        if (fs.existsSync(dir)) {
-            // console.log(`  │       EXIST [${id}] ${name}`)
-            length--
-            continue
-        }
-
         fs.ensureDirSync(dir)
-        await new Promise(async (resolve, reject) => {
+        await new Promise(async (resolve/*, reject*/) => {
             // console.log(`  │       Fetching images for equipment [${id}] ${name}`)
 
             let theId
@@ -100,7 +105,10 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
             else if (id < 100) theId = '0' + id
             else theId = id
 
+            let fail = false
+
             for (let type of pics) {
+                if (fail) continue
                 await getFile(
                     url.parse(`http://203.104.209.23/kcs/resources/image/slotitem/${type}/${theId}.png`),
                     path.join(dir, `${type}.png`),
@@ -110,7 +118,15 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
                         // isDownloadSuccess = false
                         if (err == 404 || err.message == 404)
                             return
-                        reject(err)
+
+                        fail = true
+
+                        // 删除当前的目录
+                        fs.emptyDirSync(dir)
+                        fs.removeSync(dir)
+
+                        resolve(false)
+                        // reject(err)
                         // console.log("  │       Fetched error: ", err)
                     })
                 // .catch(err => console.log("  │       Fetched error:", err))
