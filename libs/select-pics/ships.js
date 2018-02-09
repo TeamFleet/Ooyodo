@@ -12,6 +12,8 @@ const check = [
 ]
 
 module.exports = async () => new Promise(async (resolve, reject) => {
+    const newlist = []
+
     let ships = []
     for (const id in db.ships) {
         const ship = db.ships[id]
@@ -57,69 +59,103 @@ module.exports = async () => new Promise(async (resolve, reject) => {
         await new Promise(async (resolve, reject) => {
             const matched = {}
             const md5 = {}
-            for (const picId of check) {
-                const file = path.resolve(dir.extracted, `${picId}.png`)
-                if (!fs.existsSync(file))
-                    return resolve()
-                matched[picId] = false
-                md5[picId] = await md5File(file)
-            }
-
-            for (const pic of pics) {
-                const files = {}
-                const ids = []
+            try {
                 for (const picId of check) {
-                    if (pic.id == 0) {
-                        files[picId] = path.resolve(dir.ship, `${picId}.png`)
-                        ids.push(picId)
-                    } else if (pic.id > 0) {
-                        const exillust = db.exillusts[pic.id]
-                        if (!Array.isArray(exillust.exclude) ||
-                            !exillust.exclude.includes(picId)) {
-                            files[picId] = path.resolve(
-                                pathname.repoPics,
-                                `./dist/ships-extra/${pic.id}/${picId}.png`
-                            )
+                    const file = path.resolve(dir.extracted, `${picId}.png`)
+                    if (!fs.existsSync(file))
+                        return resolve()
+                    matched[picId] = false
+                    md5[picId] = await md5File(file)
+                }
+
+                for (const pic of pics) {
+                    const files = {}
+                    const ids = []
+                    for (const picId of check) {
+                        if (pic.id == 0) {
+                            files[picId] = path.resolve(dir.ship, `${picId}.png`)
                             ids.push(picId)
+                        } else if (pic.id > 0) {
+                            const exillust = db.exillusts[pic.id]
+                            if (!Array.isArray(exillust.exclude) ||
+                                !exillust.exclude.includes(picId)) {
+                                files[picId] = path.resolve(
+                                    pathname.repoPics,
+                                    `./dist/ships-extra/${pic.id}/${picId}.png`
+                                )
+                                ids.push(picId)
+                            }
                         }
                     }
+
+                    let allMatch = true
+                    for (const picId of ids) {
+                        const file = files[picId]
+                        const md5check = await md5File(file)
+                        if (md5check == md5[picId]) {
+                            matched[picId] = pic.id
+                        } else {
+                            allMatch = false
+                        }
+                    }
+                    pic.matched = allMatch
                 }
 
-                let allMatch = true
-                for (const picId of ids) {
-                    const file = files[picId]
-                    const md5check = await md5File(file)
-                    if (md5check == md5[picId]) {
-                        matched[picId] = pic.id
-                    } else {
-                        allMatch = false
+                // let matchedOriginal = check.every(picId => (
+                //     matched[picId] === 0
+                // ))
+
+                if (!pics.some(obj => obj.matched)) {
+                    // console.log(
+                    //     `${(ship.id + '').padStart(4, ' ')} ${ship._name}`
+                    //     + '\n'
+                    //     + pics.map((obj, index) => (
+                    //         `     ${index < pics.length - 1 ? '├' : '└'} `
+                    //         + (obj.matched ? '\x1b[32m' : '')
+                    //         + `[${(obj.id + '').padStart(3, ' ')}] `
+                    //         + obj.name
+                    //         + '\x1b[0m'
+                    //     )).join('\n')
+                    //     + '\n'
+                    // )
+
+                    let didCheck = false
+                    let newMatch = true
+                    for (const obj of newlist) {
+                        const {
+                            ship: thatShip
+                        } = obj
+                        if (ship.series !== thatShip.series) {
+                            continue
+                        }
+                        for (const picId of check) {
+                            const file = path.resolve(
+                                pathname.fetched.pics.ships,
+                                `./extract/${thatShip.id}/${picId}.png`
+                            )
+                            const thatMD5 = await md5File(file)
+                            didCheck = true
+                            if (thatMD5 != md5[picId]) {
+                                newMatch = false
+                            }
+                        }
+                    }
+                    if (!didCheck || !newMatch) {
+                        newlist.push({
+                            id: exIllustsCurrentId,
+                            ship
+                        })
+                        exIllustsCurrentId++
                     }
                 }
-                pic.matched = allMatch
-            }
-
-            // let matchedOriginal = check.every(picId => (
-            //     matched[picId] === 0
-            // ))
-
-            if (!pics.some(obj => obj.matched)) {
-                console.log(
-                    `${(ship.id + '').padStart(4, ' ')} ${ship._name}`
-                    + '\n'
-                    + pics.map((obj, index) => (
-                        `     ${index < pics.length - 1 ? '├' : '└'} `
-                        + (obj.matched ? '\x1b[32m' : '')
-                        + `[${(obj.id + '').padStart(3, ' ')}] `
-                        + obj.name
-                        + '\x1b[0m'
-                    )).join('\n')
-                    + '\n'
-                )
+            } catch (err) {
+                reject(err)
             }
 
             resolve()
         })
             .catch(err => reject(err))
     }
-    resolve()
+
+    resolve(newlist)
 })

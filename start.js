@@ -154,15 +154,26 @@ const run = async () => {
      * 比对下载的舰娘图片和已有图片，选择出新的图片
      ***********************************************/
     {
-        logWIP('比对下载的舰娘图片和已有图片，选择出新的图片')
         const step = '比对下载的舰娘图片和已有图片，选择出新的图片'
-        // const waiting = spinner(step)
+        const waiting = spinner(step)
         const run = require('./libs/select-pics/ships')
         await run()
-        // .then(() => waiting.finish())
-        // .catch(err =>
-        //     waiting.fail(step + '\n  ' + (err.message || err))
-        // )
+            .then(newlist => {
+                waiting.finish()
+                if (Array.isArray(newlist) && newlist.length) {
+                    console.log(
+                        newlist.map(obj => (
+                            '  \x1b[92m' + '✦ NEW!✦ ' + '\x1b[0m'
+                            + (obj.id + '').padStart(3, ' ')
+                            + ' - '
+                            + `[${obj.ship.id}] ${obj.ship._name}`
+                        )).join('\n')
+                    )
+                }
+            })
+            .catch(err =>
+                waiting.fail(step + '\n  ' + (err.message || err))
+            )
     }
 
     /************************************************
