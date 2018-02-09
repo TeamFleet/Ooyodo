@@ -29,7 +29,8 @@
         "ora": "^1.4.0",
         "progress": "^2.0.0",
         "yargs": "^11.0.0",
-        "simple-git": "^1.89.0"
+        "simple-git": "^1.89.0",
+        "md5-file": "^3.2.3"
     },
 
     "devDependencies": {
