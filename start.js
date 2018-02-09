@@ -42,7 +42,7 @@ const run = async () => {
      * 如果提供了token，获取游戏API - start2
      ***********************************************/
     if (token) {
-        console.log(`√ Token: ${token}`)
+        console.log(`\x1b[32m√\x1b[0m Token: ${token}`)
 
         const step = '获取游戏API - start2'
         const waiting = spinner(step)
@@ -136,7 +136,18 @@ const run = async () => {
      * 初始化database
      ***********************************************/
     {
-        logWIP('初始化database')
+        const step = '初始化database'
+        const waiting = spinner(step)
+        const run = require('./libs/commons/init-db')
+        await run()
+            .then(() => waiting.finish())
+            .catch(err =>
+                waiting.fail(step + '\n  ' + (err.message || err))
+            )
+        // const {
+        //     db,
+        // } = require('./libs/vars')
+        // console.log(db)
     }
 
     /************************************************
