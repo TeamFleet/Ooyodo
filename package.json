@@ -30,7 +30,8 @@
         "progress": "^2.0.0",
         "yargs": "^11.0.0",
         "simple-git": "^1.89.0",
-        "md5-file": "^3.2.3"
+        "md5-file": "^3.2.3",
+        "ncp": "^2.0.0"
     },
 
     "devDependencies": {

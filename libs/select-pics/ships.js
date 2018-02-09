@@ -73,22 +73,27 @@ module.exports = async () => new Promise(async (resolve, reject) => {
                     const ids = []
                     for (const picId of check) {
                         if (pic.id == 0) {
-                            files[picId] = path.resolve(dir.ship, `${picId}.png`)
+                            const file = path.resolve(dir.ship, `${picId}.png`)
+                            files[picId] = file
                             ids.push(picId)
                         } else if (pic.id > 0) {
                             const exillust = db.exillusts[pic.id]
                             if (!Array.isArray(exillust.exclude) ||
-                                !exillust.exclude.includes(picId)) {
-                                files[picId] = path.resolve(
+                                !exillust.exclude.includes(picId)
+                            ) {
+                                const file = path.resolve(
                                     pathname.repoPics,
                                     `./dist/ships-extra/${pic.id}/${picId}.png`
                                 )
-                                ids.push(picId)
+                                if (fs.existsSync(file)) {
+                                    files[picId] = file
+                                    ids.push(picId)
+                                }
                             }
                         }
                     }
 
-                    let allMatch = true
+                    let allMatch = ids.length > 0 ? true : false
                     for (const picId of ids) {
                         const file = files[picId]
                         const md5check = await md5File(file)
@@ -141,9 +146,27 @@ module.exports = async () => new Promise(async (resolve, reject) => {
                         }
                     }
                     if (!didCheck || !newMatch) {
+                        const files = []
+                        for (const picId of check) {
+                            const file = path.resolve(
+                                dir.ship,
+                                `./${picId}.png`
+                            )
+                            const shipPicMD5 = await md5File(file)
+                            if (shipPicMD5 != md5[picId]) {
+                                files.push(
+                                    path.resolve(
+                                        dir.extracted,
+                                        `./${picId}.png`
+                                    )
+                                )
+                            }
+                        }
                         newlist.push({
                             id: exIllustsCurrentId,
-                            ship
+                            ship,
+                            shipExIllust: true,
+                            files
                         })
                         exIllustsCurrentId++
                     }

@@ -16,12 +16,13 @@ module.exports = (options = {}) => {
         )
     ).start()
 
-    waiting.finish = (options = {}) => {
-        waiting.stopAndPersist(Object.assign({
-            symbol: '\x1b[32m' + '√' + '\x1b[0m'
-        }, options))
-        // waiting.color = 'green'
-    }
+    // waiting.finish = (options = {}) => {
+    //     waiting.stopAndPersist(Object.assign({
+    //         symbol: '\x1b[32m' + '√' + '\x1b[0m'
+    //     }, options))
+    //     // waiting.color = 'green'
+    // }
+    waiting.finish = waiting.succeed
 
     return waiting
 }

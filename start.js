@@ -16,6 +16,7 @@ const logWIP = str => console.log('\x1b[31m' + '× \x1b[91m[WIP] \x1b[0m' + str)
 
 const run = async () => {
     let token
+    let newpics = []
 
     { // 确定访问DMM的token
         if (argv.token)
@@ -161,6 +162,7 @@ const run = async () => {
             .then(newlist => {
                 waiting.finish()
                 if (Array.isArray(newlist) && newlist.length) {
+                    newpics = newpics.concat(newlist)
                     console.log(
                         newlist.map(obj => (
                             '  \x1b[92m' + '✦ NEW!✦ ' + '\x1b[0m'
@@ -184,10 +186,21 @@ const run = async () => {
     }
 
     /************************************************
-     * 复制所有新图片到pics代码库
+     * 复制新的图片
      ***********************************************/
     {
-        logWIP('复制所有新图片到pics代码库')
+        const step = '复制新的图片'
+        const waiting = spinner(step)
+        if (Array.isArray(newpics) && newpics.length) {
+            const run = require('./libs/commons/copy-selected-pics')
+            await run(newpics)
+                .then(() => waiting.finish())
+                .catch(err =>
+                    waiting.fail(step + '\n  ' + (err.message || err))
+                )
+        } else {
+            waiting.finish(step + ' (无新图)')
+        }
     }
 
     /************************************************
