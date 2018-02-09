@@ -204,10 +204,17 @@ const run = async () => {
     }
 
     /************************************************
-     * pics代码库执行start
+     * 操作pics代码库
      ***********************************************/
     {
-        logWIP('pics代码库执行start')
+        const step = '操作pics代码库'
+        const waiting = spinner(step)
+        const run = require('./libs/commons/process-repo-pics')
+        await run(newpics)
+            .then(() => waiting.finish())
+            .catch(err =>
+                waiting.fail(step + '\n  ' + (err.message || err))
+            )
     }
 
     /************************************************
