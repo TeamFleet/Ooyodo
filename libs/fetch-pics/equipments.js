@@ -30,7 +30,7 @@ fetched_data
         `-- ...id
 */
 
-const dirFetchedData = pathname.fetchedData
+// const dirFetchedData = pathname.fetchedData
 
 /**
  * 获取装备图片资源
@@ -48,7 +48,7 @@ const dirFetchedData = pathname.fetchedData
  * @param {number} obj.length - 有效总数
  */
 module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject) => {
-    const dirPicsEquipments = path.join(dirFetchedData, 'pics', 'equipments')
+    const dirPicsEquipments = pathname.fetched.pics.equipments
     fs.ensureDirSync(dirPicsEquipments)
 
     const fileApiStart2 = pathname.apiStart2

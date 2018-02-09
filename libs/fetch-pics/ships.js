@@ -21,7 +21,7 @@ fetched_data
         `-- extract
 */
 
-const dirFetchedData = pathname.fetchedData
+// const dirFetchedData = pathname.fetchedData
 
 /**
  * 获取舰娘图片资源
@@ -39,7 +39,7 @@ const dirFetchedData = pathname.fetchedData
  * @param {number} obj.length - 有效总数
  */
 module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject) => {
-    const dirPicsShips = path.join(dirFetchedData, 'pics', 'ships')
+    const dirPicsShips = pathname.fetched.pics.ships
     const dirPicsShipsRaw = path.join(dirPicsShips, 'raw')
     const dirPicsShipsExtract = path.join(dirPicsShips, 'extract')
 

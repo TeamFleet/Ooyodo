@@ -11,6 +11,13 @@ module.exports = {
 
     pathname: {
         fetchedData: path.resolve(process.cwd(), './.fetched_data'),
+        fetched: {
+            pics: {
+                ships: path.resolve(process.cwd(), './.fetched_data/pics/ships'),
+                equipments: path.resolve(process.cwd(), './.fetched_data/pics/equipments'),
+            }
+        },
+
         repoPics: path.resolve(process.cwd(), './.repo_pics'),
         repoDatabase: path.resolve(process.cwd(), './.repo_database'),
 

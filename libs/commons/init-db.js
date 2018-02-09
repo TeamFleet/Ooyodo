@@ -1,6 +1,6 @@
 const fs = require('fs-extra')
 const path = require('path')
-const { parseRaw } = require('kckit')
+const { parseRaw, register } = require('kckit')
 
 const {
     db,
@@ -13,7 +13,7 @@ module.exports = async () => new Promise(async (resolve, reject) => {
         'ships',
         ['shipTypes', 'ship_types'],
         ['shipClasses', 'ship_classes'],
-        ['shipNameSuffix', 'ship_namesuffix'],
+        ['shipNamesuffix', 'ship_namesuffix'],
         ['shipSeries', 'ship_series'],
 
         ['equipments', 'items'],
@@ -44,6 +44,9 @@ module.exports = async () => new Promise(async (resolve, reject) => {
     }
 
     parseRaw(raw, db)
+    register({
+        db
+    })
 
     resolve(db)
 })

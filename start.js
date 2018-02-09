@@ -155,6 +155,14 @@ const run = async () => {
      ***********************************************/
     {
         logWIP('比对下载的舰娘图片和已有图片，选择出新的图片')
+        const step = '比对下载的舰娘图片和已有图片，选择出新的图片'
+        // const waiting = spinner(step)
+        const run = require('./libs/select-pics/ships')
+        await run()
+        // .then(() => waiting.finish())
+        // .catch(err =>
+        //     waiting.fail(step + '\n  ' + (err.message || err))
+        // )
     }
 
     /************************************************
