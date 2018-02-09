@@ -14,10 +14,11 @@ module.exports = async () => new Promise(async (resolve, reject) => {
 
     for (const ship of ships) {
         await new Promise((resolve, reject) => {
-            const extraIllust = ship._extraIllust || []
+            const illusts = ship._extraIllust || []
+            illusts.unshift(-1)
             console.log(
-                `[${(ship.id + '').padStart(4, ' ')}] ${ship._name}`
-                + '\n' + (extraIllust.length ? `       \`-- ${extraIllust.join(',')}` : ' ')
+                `${(ship.id + '').padStart(4, ' ')} ┌── ${ship._name}`
+                + '\n' + `     └── ${illusts.join(', ')}`
             )
             resolve()
         })
