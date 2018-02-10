@@ -152,25 +152,40 @@ const run = async () => {
     }
 
     /************************************************
-     * 比对下载的舰娘图片和已有图片，选择出新的图片
+     * 查找新的舰娘图片
      ***********************************************/
     {
-        const step = '比对下载的舰娘图片和已有图片，选择出新的图片'
+        const step = '查找新的舰娘图片'
         const waiting = spinner(step)
         const run = require('./libs/select-pics/ships')
         await run()
             .then(newlist => {
-                waiting.finish()
                 if (Array.isArray(newlist) && newlist.length) {
+                    waiting.finish()
                     newpics = newpics.concat(newlist)
                     console.log(
-                        newlist.map(obj => (
-                            '  \x1b[92m' + '✦ NEW!✦ ' + '\x1b[0m'
-                            + (obj.id + '').padStart(3, ' ')
-                            + ' - '
-                            + `[${obj.ship.id}] ${obj.ship._name}`
-                        )).join('\n')
+                        newlist.map(obj => {
+                            let msg = '  \x1b[92m' + '✦ NEW!✦ ' + '\x1b[0m'
+                                + (obj.id + '').padStart(3, ' ')
+                                + ' - '
+
+                            if (typeof obj.ship === 'object') {
+                                if (obj.ship.id == obj.id) {
+                                    msg += obj.ship._name
+                                } else {
+                                    msg += `[${obj.ship.id}] ${obj.ship._name}`
+                                }
+                            } else if (obj.ship === true) {
+                                msg += '新舰娘'
+                            } else if (typeof obj.ship === 'string') {
+                                msg += obj.ship
+                            }
+
+                            return msg
+                        }).join('\n')
                     )
+                } else {
+                    waiting.finish(step + ': 无新图')
                 }
             })
             .catch(err =>
@@ -188,33 +203,31 @@ const run = async () => {
     /************************************************
      * 复制新的图片
      ***********************************************/
-    {
+    if (Array.isArray(newpics) && newpics.length) {
+        // logWIP('复制新的图片')
         const step = '复制新的图片'
         const waiting = spinner(step)
-        if (Array.isArray(newpics) && newpics.length) {
-            const run = require('./libs/commons/copy-selected-pics')
-            await run(newpics)
-                .then(() => waiting.finish())
-                .catch(err =>
-                    waiting.fail(step + '\n  ' + (err.message || err))
-                )
-        } else {
-            waiting.finish(step + ' (无新图)')
-        }
-    }
-
-    /************************************************
-     * 操作pics代码库
-     ***********************************************/
-    {
-        const step = '操作pics代码库'
-        const waiting = spinner(step)
-        const run = require('./libs/commons/process-repo-pics')
+        const run = require('./libs/commons/copy-selected-pics')
         await run(newpics)
             .then(() => waiting.finish())
             .catch(err =>
                 waiting.fail(step + '\n  ' + (err.message || err))
             )
+    }
+
+    /************************************************
+     * 操作pics代码库
+     ***********************************************/
+    if (Array.isArray(newpics) && newpics.length) {
+        logWIP('操作pics代码库')
+        // const step = '操作pics代码库'
+        // const waiting = spinner(step)
+        // const run = require('./libs/commons/process-repo-pics')
+        // await run(newpics)
+        //     .then(() => waiting.finish())
+        //     .catch(err =>
+        //         waiting.fail(step + '\n  ' + (err.message || err))
+        //     )
     }
 
     /************************************************

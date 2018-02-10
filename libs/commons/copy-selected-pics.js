@@ -10,16 +10,14 @@ ncp.limit = 16
 
 const copy = async obj => {
     let target, targetNew, id
-    if (obj.ship) {
-        if (obj.shipExIllust) {
-            id = obj.id
-            target = path.resolve(pathname.repoPics, `./dist/ships-extra/${id}`)
-            targetNew = path.resolve(pathname.newPics, `./ships-extra/${id}`)
-        } else {
-            id = obj.ship.id
-            target = path.resolve(pathname.repoPics, `./dist/ships/${id}`)
-            targetNew = path.resolve(pathname.newPics, `./ships/${id}`)
-        }
+    if (obj.shipExIllust) {
+        id = obj.id
+        target = path.resolve(pathname.repoPics, `./dist/ships-extra/${id}`)
+        targetNew = path.resolve(pathname.newPics, `./ships-extra/${id}`)
+    } else if (obj.ship) {
+        id = typeof obj.ship === 'object' ? obj.ship.id : obj.id
+        target = path.resolve(pathname.repoPics, `./dist/ships/${id}`)
+        targetNew = path.resolve(pathname.newPics, `./ships/${id}`)
     } else if (obj.equipment) {
         id = obj.equipment.id
         target = path.resolve(pathname.repoPics, `./dist/equipments/${id}`)

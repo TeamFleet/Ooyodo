@@ -5,6 +5,7 @@ const md5File = require('md5-file/promise')
 const {
     db,
     pathname,
+    enemyIdStartFrom,
 } = require('../vars')
 
 const check = [
@@ -31,6 +32,66 @@ module.exports = async () => new Promise(async (resolve, reject) => {
     }
     exIllustsCurrentId++
 
+    // 检查新增
+    {
+        const dir = path.resolve(pathname.fetched.pics.ships, `./extract`)
+        const list = await fs.readdir(dir)
+        const apiStart2 = await fs.readJSON(pathname.apiStart2)
+
+        if (typeof apiStart2 !== 'object' ||
+            typeof apiStart2.api_data !== 'object' ||
+            typeof apiStart2.api_data.api_mst_ship !== 'object') {
+            return reject('api_start2.json 已损坏，请提供 token 以重新下载')
+        }
+
+        list
+            .filter(filename => {
+                if (isNaN(filename) ||
+                    !fs.lstatSync(path.resolve(dir, filename)).isDirectory()
+                )
+                    return false
+
+                const id = parseInt(filename)
+
+                if (id >= enemyIdStartFrom ||
+                    id in db.ships
+                )
+                    return false
+
+                return true
+            })
+            .sort((a, b) => parseInt(a) - parseInt(b))
+            .map(filename => {
+                const id = parseInt(filename)
+                let ship = id
+                apiStart2.api_data.api_mst_ship.some(o => {
+                    if (id == o.api_id) {
+                        ship = {
+                            id,
+                            name: o.api_name
+                        }
+                        return true
+                    }
+                    return false
+                })
+                return ship
+            })
+            .filter(ship => typeof ship === 'object')
+            .forEach(ship => {
+                newlist.push({
+                    id: ship.id,
+                    ship: ship.name,
+                    files: check.map(picId => (
+                        path.resolve(
+                            dir,
+                            `./${ship.id}/${picId}.png`
+                        )
+                    ))
+                })
+            })
+    }
+
+    // 检查已在库中的
     for (const ship of ships) {
         // 目录资源
         const dir = {
