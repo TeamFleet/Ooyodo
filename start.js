@@ -219,15 +219,15 @@ const run = async () => {
      * 操作pics代码库
      ***********************************************/
     if (Array.isArray(newpics) && newpics.length) {
-        logWIP('操作pics代码库')
-        // const step = '操作pics代码库'
-        // const waiting = spinner(step)
-        // const run = require('./libs/commons/process-repo-pics')
-        // await run(newpics)
-        //     .then(() => waiting.finish())
-        //     .catch(err =>
-        //         waiting.fail(step + '\n  ' + (err.message || err))
-        //     )
+        // logWIP('操作pics代码库')
+        const step = '操作pics代码库'
+        const waiting = spinner(step)
+        const run = require('./libs/commons/process-repo-pics')
+        await run(newpics)
+            .then(() => waiting.finish())
+            .catch(err =>
+                waiting.fail(step + '\n  ' + (err.message || err))
+            )
     }
 
     /************************************************

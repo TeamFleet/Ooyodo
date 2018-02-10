@@ -19,7 +19,7 @@ const copy = async obj => {
         target = path.resolve(pathname.repoPics, `./dist/ships/${id}`)
         targetNew = path.resolve(pathname.newPics, `./ships/${id}`)
     } else if (obj.equipment) {
-        id = obj.equipment.id
+        id = typeof obj.equipment === 'object' ? obj.equipment.id : obj.id
         target = path.resolve(pathname.repoPics, `./dist/equipments/${id}`)
         targetNew = path.resolve(pathname.newPics, `./equipments/${id}`)
     }
