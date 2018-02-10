@@ -1,13 +1,17 @@
 const path = require('path')
 const spinners = require('cli-spinners')
+const {
+    enemyIdStartFrom,
+    // enemyEquipmentIdStartFrom
+} = require('kckit')
 
 module.exports = {
     db: {},
 
     spinner: spinners.dots,
 
-    enemyIdStartFrom: 1501,
-    enemyEquipmentIdStartFrom: 501,
+    enemyIdStartFrom,
+    enemyEquipmentIdStartFrom: 500,
 
     pathname: {
         fetchedData: path.resolve(process.cwd(), './.fetched_data'),

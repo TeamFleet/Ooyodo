@@ -194,10 +194,37 @@ const run = async () => {
     }
 
     /************************************************
-     * 比对下载的装备图片和已有图片，选择出新的图片
+     * 查找新的装备图片
      ***********************************************/
     {
-        logWIP('比对下载的装备图片和已有图片，选择出新的图片')
+        const step = '查找新的装备图片'
+        const waiting = spinner(step)
+        const run = require('./libs/select-pics/equipments')
+        await run(newpics)
+            .then(newlist => {
+                if (Array.isArray(newlist) && newlist.length) {
+                    waiting.finish()
+                    newpics = newpics.concat(newlist)
+                    console.log(
+                        newlist.map(obj => {
+                            let msg = '  \x1b[92m' + '✦ NEW!✦ ' + '\x1b[0m'
+                                + (obj.id + '').padStart(3, ' ')
+                                + ' - '
+                            if (obj.equipment === true) {
+                                msg += '新装备'
+                            } else if (typeof obj.equipment === 'string') {
+                                msg += obj.equipment
+                            }
+                            return msg
+                        }).join('\n')
+                    )
+                } else {
+                    waiting.finish(step + ': 无新图')
+                }
+            })
+            .catch(err =>
+                waiting.fail(step + '\n  ' + (err.message || err))
+            )
     }
 
     /************************************************
@@ -218,17 +245,17 @@ const run = async () => {
     /************************************************
      * 操作pics代码库
      ***********************************************/
-    if (Array.isArray(newpics) && newpics.length) {
-        // logWIP('操作pics代码库')
-        const step = '操作pics代码库'
-        const waiting = spinner(step)
-        const run = require('./libs/commons/process-repo-pics')
-        await run(newpics)
-            .then(() => waiting.finish())
-            .catch(err =>
-                waiting.fail(step + '\n  ' + (err.message || err))
-            )
-    }
+    // if (Array.isArray(newpics) && newpics.length) {
+    //     // logWIP('操作pics代码库')
+    //     const step = '操作pics代码库'
+    //     const waiting = spinner(step)
+    //     const run = require('./libs/commons/process-repo-pics')
+    //     await run(newpics)
+    //         .then(() => waiting.finish())
+    //         .catch(err =>
+    //             waiting.fail(step + '\n  ' + (err.message || err))
+    //         )
+    // }
 
     /************************************************
      * 更新database
