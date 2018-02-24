@@ -14,6 +14,7 @@ module.exports = async (title, run) => {
     let currentFrame = 0
     let completed = 0
     let total = 0
+    const failed = []
 
     const symbolTicking = () => {
         let symbol = '\x1b[36m' + spinnerObj.frames[currentFrame] + '\x1b[0m'
@@ -26,9 +27,11 @@ module.exports = async (title, run) => {
     }
 
     await run(({
-        // ship,
+        ship,
         // index,
-        length
+        length,
+        complete,
+        url,
     }) => {
         // console.log(currentShipIndex, shipsCount)
         if (!bar) {
@@ -48,16 +51,25 @@ module.exports = async (title, run) => {
             interval = setInterval(symbolTicking, spinnerObj.interval)
         }
         bar.tick()
-        completed++
+
+        if (complete) {
+            completed++
+        } else {
+            failed.push({
+                ship,
+                url,
+            })
+        }
     })
         // .then((/*isSuccess*/) => {
         //     waiting.stop()
         //     clearInterval(interval)
         //     spinner(step).finish()
         // })
-        .catch(err =>
-            waiting.fail(step + '\n  ' + (err.message || err))
-        )
+        // .catch(err =>
+        //     waiting.fail(step + '\n  ' + (err.message || err))
+        // )
+        .catch()
 
     if (bar) bar.terminate()
     if (waiting) waiting.stop()
@@ -66,6 +78,15 @@ module.exports = async (title, run) => {
     if (completed < total) {
         spinner(step).fail(step + '\n  ' +
             `${total - completed} 项内容未下载成功`)
+        failed.forEach(o => {
+            console.log(
+                '  \x1b[31m' + '✦ ' + '\x1b[0m'
+                + o.ship.api_id
+                + ' - '
+                + o.ship.api_name
+                // + ` (${o.url})`
+            )
+        })
     } else {
         spinner(step).finish()
     }

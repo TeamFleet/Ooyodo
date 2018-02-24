@@ -44,7 +44,7 @@ module.exports = async () => new Promise(async (resolve, reject) => {
             return reject('api_start2.json 已损坏，请提供 token 以重新下载')
         }
 
-        list
+        const newShips = list
             .filter(filename => {
                 if (isNaN(filename) ||
                     !fs.lstatSync(path.resolve(dir, filename)).isDirectory()
@@ -77,18 +77,24 @@ module.exports = async () => new Promise(async (resolve, reject) => {
                 return ship
             })
             .filter(ship => typeof ship === 'object')
-            .forEach(ship => {
-                newlist.push({
-                    id: ship.id,
-                    ship: ship.name,
-                    files: check.map(picId => (
-                        path.resolve(
-                            dir,
-                            `./${ship.id}/${picId}.png`
-                        )
+
+        for (const ship of newShips) {
+            const dirShip = path.resolve(dir, `./${ship.id}`)
+            const files = await fs.readdir(dirShip)
+            // console.log(ship.name)
+            newlist.push({
+                id: ship.id,
+                ship: ship.name,
+                isNew: true,
+                files: files
+                    .filter(filename => (
+                        !fs.lstatSync(path.resolve(dirShip, filename)).isDirectory()
                     ))
-                })
+                    .map(filename => (
+                        path.resolve(dirShip, filename)
+                    ))
             })
+        }
     }
 
     // 检查已在库中的
@@ -188,6 +194,10 @@ module.exports = async () => new Promise(async (resolve, reject) => {
                     let didCheck = false
                     let newMatch = true
                     for (const obj of newlist) {
+                        if (obj.isNew) {
+                            didCheck = true
+                            continue
+                        }
                         const {
                             ship: thatShip
                         } = obj

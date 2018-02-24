@@ -234,6 +234,7 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
     for (let i in shipgraph) {
         const o = shipgraph[i]
         const id = o.api_id
+        // console.log(id, o.api_filename)
         if (typeof map[id] !== 'undefined') {
             map[id] = o.api_filename
 
@@ -265,15 +266,18 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
             let isDownloadSuccess = true
 
             // console.log(`  │       Fetching ${map[id]}.swf for ship [${id}] ${name}`)
-
+            // http://203.104.209.23/kcs/resources/swf/ships/aqgjvutybsbk.swf?VERSION=8
+            const downloadlink = `http://203.104.209.23/kcs/resources/swf/ships/${map[id]}.swf`
             await getFile(
-                url.parse(`http://203.104.209.23/kcs/resources/swf/ships/${map[id]}.swf?VERSION=${picsVersions[id]}`),
+                url.parse(downloadlink),
                 pathFile,
                 proxy
             )
                 .catch(err => {
                     isDownloadSuccess = false
-                    reject(err)
+                    // console.log(err)
+                    // return reject(err)
+                    // reject(err)
                     // console.log("  │       Fetched error: ", err)
                 })
 
@@ -334,7 +338,9 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
                 onProgress({
                     ship: ship,
                     index: completeIndex,
-                    length: needUpdate.length
+                    length: needUpdate.length,
+                    complete: isDownloadSuccess,
+                    url: downloadlink,
                 })
 
             completeIndex++
