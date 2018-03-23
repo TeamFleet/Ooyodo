@@ -17,7 +17,7 @@ module.exports = async () => new Promise(async (resolve, reject) => {
                 cwd: dir,
                 // shell: true,
             },
-            (err, stdout, stderr) => {
+            (err/*, stdout, stderr*/) => {
                 if (err)
                     return reject(err)
                 // console.log('stdout ', stdout);

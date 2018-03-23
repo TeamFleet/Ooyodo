@@ -194,8 +194,9 @@ module.exports = async () => new Promise(async (resolve, reject) => {
                     let didCheck = false
                     let newMatch = true
                     for (const obj of newlist) {
+                        // console.log(obj)
                         if (obj.isNew) {
-                            didCheck = true
+                            // didCheck = true
                             continue
                         }
                         const {
@@ -216,6 +217,7 @@ module.exports = async () => new Promise(async (resolve, reject) => {
                             }
                         }
                     }
+
                     if (!didCheck || !newMatch) {
                         const files = []
                         for (const picId of check) {
@@ -233,6 +235,7 @@ module.exports = async () => new Promise(async (resolve, reject) => {
                                 )
                             }
                         }
+
                         newlist.push({
                             id: exIllustsCurrentId,
                             ship,
