@@ -11,6 +11,7 @@ module.exports = async () => new Promise(async (resolve, reject) => {
     const dir = pathname.repoPics
 
     const run = command => new Promise((resolve, reject) => {
+        // console.log(dir, command)
         exec(
             command,
             {
@@ -18,17 +19,20 @@ module.exports = async () => new Promise(async (resolve, reject) => {
                 // shell: true,
             },
             (err/*, stdout, stderr*/) => {
-                if (err)
-                    return reject(err)
-                // console.log('stdout ', stdout);
-                // console.log('stderr ', stderr);
+                if (err) return reject(err)
+                // console.log('stdout ', stdout)
+                // console.log('stderr ', stderr)
                 resolve()
             }
         )
     }).catch(err => reject(err))
 
-    await run(`npm i --no-save`)
-    await run(`npm start`)
+    try {
+        await run(`npm i --no-save`)
+        await run(`npm start`)
+    } catch (e) {
+        reject(e)
+    }
 
     {// 修改版本号
         const file = path.resolve(dir, 'package.json')
@@ -45,6 +49,7 @@ module.exports = async () => new Promise(async (resolve, reject) => {
         )
     }
 
+    // resolve()
     try {
         const repo = git(dir)
         await repo.add('./*')

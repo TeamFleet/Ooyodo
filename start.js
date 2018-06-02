@@ -258,6 +258,21 @@ const run = async () => {
     }
 
     /************************************************
+     * 复制处理完毕的新图片
+     ***********************************************/
+    if (Array.isArray(newpics) && newpics.length) {
+        // logWIP('复制新的图片')
+        const step = '复制处理完毕的新图片'
+        const waiting = spinner(step)
+        const run = require('./libs/commons/copy-selected-pics-post')
+        await run(newpics)
+            .then(() => waiting.finish())
+            .catch(err =>
+                waiting.fail(step + '\n  ' + (err.message || err))
+            )
+    }
+
+    /************************************************
      * 更新database
      ***********************************************/
     {

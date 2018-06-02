@@ -1,7 +1,7 @@
 {
     "name": "ooyodo",
 
-    "version": "0.0.4",
+    "version": "0.0.5",
 
     "description": "Data-related tools for [WhoCallsTheFleet](https://github.com/TeamFleet/WhoCallsTheFleet)",
     "author": {
@@ -20,21 +20,21 @@
     },
 
     "dependencies": {
-        "kckit": "^1.16.12",
+        "kckit": "^1.17.4",
 
-        "fs-extra": "^5.0.0",
-        "request": "^2.83.0",
+        "fs-extra": "^6.0.1",
+        "request": "^2.87.0",
         "nedb-promise": "^2.0.1",
         "jpexs-flash-decompiler": "Diablohu/jpexs-flash-decompiler",
-        "ora": "^1.4.0",
+        "ora": "^2.1.0",
         "progress": "^2.0.0",
         "yargs": "^11.0.0",
-        "simple-git": "^1.89.0",
-        "md5-file": "^3.2.3",
+        "simple-git": "^1.95.1",
+        "md5-file": "^4.0.0",
         "ncp": "^2.0.0"
     },
 
     "devDependencies": {
-        "eslint": "^4.17.0"
+        "eslint": "^4.19.1"
     }
 }
