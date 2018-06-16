@@ -43,9 +43,9 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
     const dirPicsShipsRaw = path.join(dirPicsShips, 'raw')
     const dirPicsShipsExtract = path.join(dirPicsShips, 'extract')
 
-    fs.ensureDirSync(dirPicsShips)
-    fs.ensureDirSync(dirPicsShipsRaw)
-    fs.ensureDirSync(dirPicsShipsExtract)
+    await fs.ensureDir(dirPicsShips)
+    await fs.ensureDir(dirPicsShipsRaw)
+    await fs.ensureDir(dirPicsShipsExtract)
 
     const fileApiStart2 = pathname.apiStart2
     const filePicsVersions = path.join(dirPicsShips, 'pics_versions.json')
@@ -84,141 +84,141 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
 
     /* data examples
 
-    ship: {
-        "api_id": 1,
-        "api_sortno": 31,
-        "api_name": "睦月",
-        "api_yomi": "むつき",
-        "api_stype": 2,
-        "api_ctype": 28,
-        "api_afterlv": 20,
-        "api_aftershipid": "254",
-        "api_taik": [
-          13,
-          24
-        ],
-        "api_souk": [
-          5,
-          18
-        ],
-        "api_houg": [
-          6,
-          29
-        ],
-        "api_raig": [
-          18,
-          59
-        ],
-        "api_tyku": [
-          7,
-          29
-        ],
-        "api_luck": [
-          12,
-          49
-        ],
-        "api_soku": 10,
-        "api_leng": 1,
-        "api_slot_num": 2,
-        "api_maxeq": [
-          0,
-          0,
-          0,
-          0,
-          0
-        ],
-        "api_buildtime": 18,
-        "api_broken": [
-          1,
-          1,
-          4,
-          0
-        ],
-        "api_powup": [
-          1,
-          1,
-          0,
-          0
-        ],
-        "api_backs": 3,
-        "api_getmes": "睦月です。<br>はりきって、まいりましょー！",
-        "api_afterfuel": 100,
-        "api_afterbull": 100,
-        "api_fuel_max": 15,
-        "api_bull_max": 15,
-        "api_voicef": 0
-    }
+        ship: {
+            "api_id": 1,
+            "api_sortno": 31,
+            "api_name": "睦月",
+            "api_yomi": "むつき",
+            "api_stype": 2,
+            "api_ctype": 28,
+            "api_afterlv": 20,
+            "api_aftershipid": "254",
+            "api_taik": [
+            13,
+            24
+            ],
+            "api_souk": [
+            5,
+            18
+            ],
+            "api_houg": [
+            6,
+            29
+            ],
+            "api_raig": [
+            18,
+            59
+            ],
+            "api_tyku": [
+            7,
+            29
+            ],
+            "api_luck": [
+            12,
+            49
+            ],
+            "api_soku": 10,
+            "api_leng": 1,
+            "api_slot_num": 2,
+            "api_maxeq": [
+            0,
+            0,
+            0,
+            0,
+            0
+            ],
+            "api_buildtime": 18,
+            "api_broken": [
+            1,
+            1,
+            4,
+            0
+            ],
+            "api_powup": [
+            1,
+            1,
+            0,
+            0
+            ],
+            "api_backs": 3,
+            "api_getmes": "睦月です。<br>はりきって、まいりましょー！",
+            "api_afterfuel": 100,
+            "api_afterbull": 100,
+            "api_fuel_max": 15,
+            "api_bull_max": 15,
+            "api_voicef": 0
+        }
 
-    shipgraph: {
-        "api_id": 1,
-        "api_sortno": 31,
-        "api_filename": "snohitatusbk",
-        "api_version": [
-          "21",
-          "19",
-          "1"
-        ],
-        "api_boko_n": [
-          125,
-          24
-        ],
-        "api_boko_d": [
-          83,
-          25
-        ],
-        "api_kaisyu_n": [
-          28,
-          7
-        ],
-        "api_kaisyu_d": [
-          28,
-          7
-        ],
-        "api_kaizo_n": [
-          70,
-          -31
-        ],
-        "api_kaizo_d": [
-          29,
-          -32
-        ],
-        "api_map_n": [
-          29,
-          24
-        ],
-        "api_map_d": [
-          -13,
-          15
-        ],
-        "api_ensyuf_n": [
-          129,
-          18
-        ],
-        "api_ensyuf_d": [
-          -3,
-          -32
-        ],
-        "api_ensyue_n": [
-          129,
-          0
-        ],
-        "api_battle_n": [
-          73,
-          27
-        ],
-        "api_battle_d": [
-          29,
-          21
-        ],
-        "api_weda": [
-          112,
-          108
-        ],
-        "api_wedb": [
-          145,
-          153
-        ]
-    }
+        shipgraph: {
+            "api_id": 1,
+            "api_sortno": 31,
+            "api_filename": "snohitatusbk",
+            "api_version": [
+            "21",
+            "19",
+            "1"
+            ],
+            "api_boko_n": [
+            125,
+            24
+            ],
+            "api_boko_d": [
+            83,
+            25
+            ],
+            "api_kaisyu_n": [
+            28,
+            7
+            ],
+            "api_kaisyu_d": [
+            28,
+            7
+            ],
+            "api_kaizo_n": [
+            70,
+            -31
+            ],
+            "api_kaizo_d": [
+            29,
+            -32
+            ],
+            "api_map_n": [
+            29,
+            24
+            ],
+            "api_map_d": [
+            -13,
+            15
+            ],
+            "api_ensyuf_n": [
+            129,
+            18
+            ],
+            "api_ensyuf_d": [
+            -3,
+            -32
+            ],
+            "api_ensyue_n": [
+            129,
+            0
+            ],
+            "api_battle_n": [
+            73,
+            27
+            ],
+            "api_battle_d": [
+            29,
+            21
+            ],
+            "api_weda": [
+            112,
+            108
+            ],
+            "api_wedb": [
+            145,
+            153
+            ]
+        }
      */
 
     // 确定舰娘图片的加密URL对应
@@ -287,7 +287,7 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
                 // console.log(`  │           Fetched.`)
                 // console.log(`  │           Decompiling swf for ship #${id}...`)
                 const dirPicsShipsExtractShip = path.join(dirPicsShipsExtract, '' + id)
-                fs.ensureDirSync(dirPicsShipsExtractShip)
+                await fs.ensureDir(dirPicsShipsExtractShip)
                 await new Promise(async (resolve, reject) => {
                     jpexs.export({
                         file: pathFile,
@@ -305,7 +305,10 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
                         }
                     });
                 })
-                    .catch(err => reject(err))
+                    .catch(err => {
+                        // console.log('Error: ', err)
+                        reject(err)
+                    })
                 // console.log(`  │           Decompiled -> /fetched_data/pics/ships/extract/${id}`)
 
                 fs.readdirSync(dirPicsShipsExtractShip).forEach(file => {

@@ -117,10 +117,15 @@ const run = async () => {
      * 下载舰娘图片
      ***********************************************/
     {
-        await download(
-            '下载舰娘图片',
-            require('./libs/fetch-pics/ships')
-        )
+        try {
+            await download(
+                '下载舰娘图片',
+                require('./libs/fetch-pics/ships')
+            )
+        } catch (err) {
+            console.log(err)
+            throw err
+        }
     }
 
     /************************************************
