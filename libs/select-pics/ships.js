@@ -145,8 +145,8 @@ module.exports = async () => new Promise(async (resolve, reject) => {
                             ids.push(picId)
                         } else if (pic.id > 0) {
                             const exillust = db.exillusts[pic.id]
-                            if (!Array.isArray(exillust.exclude) ||
-                                !exillust.exclude.includes(picId)
+                            if (exillust && (!Array.isArray(exillust.exclude) ||
+                                !exillust.exclude.includes(picId))
                             ) {
                                 const file = path.resolve(
                                     pathname.repoPics,

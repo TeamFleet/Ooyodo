@@ -24,5 +24,14 @@ module.exports = (options = {}) => {
     // }
     waiting.finish = waiting.succeed
 
+    waiting.error = (title, err) => {
+        if (err instanceof Error) {
+            waiting.fail(title)
+            console.error(err)
+            return
+        }
+        waiting.fail(title + '\n  ' + (err.message || err))
+    }
+
     return waiting
 }

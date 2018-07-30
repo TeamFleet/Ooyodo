@@ -193,9 +193,7 @@ const run = async () => {
                     waiting.finish(step + ': 无新图')
                 }
             })
-            .catch(err =>
-                waiting.fail(step + '\n  ' + (err.message || err))
-            )
+            .catch(err => waiting.error(step, err))
     }
 
     /************************************************
