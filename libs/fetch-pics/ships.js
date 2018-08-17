@@ -30,7 +30,7 @@ const imgTypes = [
 ]
 const imgTypesEnemy = [
     'full',
-    'full_dmg',
+    // 'full_dmg',
     'banner',
     // 'banner_dmg',
 ]
