@@ -1,16 +1,41 @@
 const path = require('path')
 const url = require('url')
 const fs = require('fs-extra')
-const jpexs = require('jpexs-flash-decompiler')
 
 const {
     enemyIdStartFrom,
     pathname,
 } = require('../vars')
+const { World_17: apiOrigin } = require('../servers')
 
-const getFile = require('../commons/get-file')
+const fetchFile = require('../commons/fetch-file')
+const zeroPadding = require('../commons/zero-padding')
+const suffixUtils = require('../commons/suffix-utils')
 
-// http://203.104.209.23/kcs/resources/swf/ships/nehcyhpiviue.swf?VERSION=7
+const dirPicsShips = pathname.fetched.pics.ships
+const fileApiStart2 = pathname.apiStart2
+const filePicsVersions = path.join(dirPicsShips, '../ships_versions.json')
+
+const imgTypes = [
+    'full',
+    'full_dmg',
+    // 'supply_character',
+    // 'supply_character_dmg',
+    'remodel',
+    // 'remodel_dmg',
+    'banner',
+    // 'banner_dmg',
+    'card',
+    // 'card_dmg',
+]
+const imgTypesEnemy = [
+    'full',
+    'full_dmg',
+    'banner',
+    // 'banner_dmg',
+]
+
+// http://203.104.209.23/kcs2/resources/ship/full/0406_6059.png?version=2
 
 /*
 fetched_data
@@ -20,8 +45,6 @@ fetched_data
         +-- raw
         `-- extract
 */
-
-// const dirFetchedData = pathname.fetchedData
 
 /**
  * 获取舰娘图片资源
@@ -38,49 +61,39 @@ fetched_data
  * @param {number} obj.index - 当前完成的index
  * @param {number} obj.length - 有效总数
  */
-module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject) => {
-    const dirPicsShips = pathname.fetched.pics.ships
-    const dirPicsShipsRaw = path.join(dirPicsShips, 'raw')
-    const dirPicsShipsExtract = path.join(dirPicsShips, 'extract')
+module.exports = async (onProgress, proxy) => {
 
     await fs.ensureDir(dirPicsShips)
-    await fs.ensureDir(dirPicsShipsRaw)
-    await fs.ensureDir(dirPicsShipsExtract)
-
-    const fileApiStart2 = pathname.apiStart2
-    const filePicsVersions = path.join(dirPicsShips, 'pics_versions.json')
-
-    let picsVersions
 
     if (!fs.existsSync(fileApiStart2))
-        return reject('api_start2 不存在')
+        throw new Error('api_start2 不存在')
 
-    if (fs.existsSync(filePicsVersions)) {
-        // console.log('  ├── Found pics_versions.json. Loaded.')
-        picsVersions = fs.readJSONSync(filePicsVersions)
-    } else {
-        // console.log('  ├── No pics_versions.json. First run.')
-        picsVersions = {}
-    }
+    if (!fs.existsSync(filePicsVersions))
+        await fs.writeJson(filePicsVersions, {})
 
-    const apiStart2 = fs.readJSONSync(fileApiStart2)
+    const ships = {} // 舰娘元数据
+    const map = {} // 舰娘和加密ID的对应
+    const picsVersions = await fs.readJSON(filePicsVersions) // 已存在的舰娘图片版本
+    const needUpdate = [] // 需要更新的舰娘
+    const picsVersionsNew = {} // 更新后的舰娘图片版本
+    const downloadList = [] // 下载URL列表
+    const apiStart2 = await fs.readJSON(fileApiStart2)
+
+    let completeIndex = 0
+
     if (typeof apiStart2 !== 'object' ||
         typeof apiStart2.api_data !== 'object' ||
         typeof apiStart2.api_data.api_mst_ship !== 'object' ||
         typeof apiStart2.api_data.api_mst_shipgraph !== 'object') {
-        return reject('api_start2.json 已损坏，请提供 token 以重新下载')
+        throw new Error('api_start2.json 已损坏，请提供 token 以重新下载')
     }
-    const {
-        api_mst_ship: rawShips,
-        api_mst_shipgraph: shipgraph,
-    } = apiStart2.api_data
 
-    let ships = {} // 舰娘元数据
-    let map = {} // 舰娘和加密URL的对应
-    let needUpdate = [] // 需要更新的舰娘
-    let picsVersionsNew = {}
-    // let shipsCount = 0
-    let completeIndex = 0
+    const {
+        api_data: {
+            api_mst_ship: rawShips,
+            api_mst_shipgraph: shipgraph,
+        }
+    } = apiStart2
 
     /* data examples
 
@@ -221,7 +234,7 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
         }
      */
 
-    // 确定舰娘图片的加密URL对应
+    // 确定舰娘图片的加密ID对应
     for (let i in rawShips) {
         if (rawShips[i].api_name !== 'なし') {
             ships[rawShips[i].api_id] = rawShips[i]
@@ -255,108 +268,62 @@ module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject
         }
     }
 
-
-    // console.log('  ├── Data parsed. Start fetching SWF files...')
     for (let id of needUpdate) {
-        await new Promise(async (resolve, reject) => {
-            const ship = ships[id]
-            const name = ship.api_name + (id >= enemyIdStartFrom && ship.api_yomi !== '-' ? (ship.api_yomi || '') : '')
-            const pathFile = path.join(dirPicsShipsRaw, `[${id}] ${name}.swf`)
+        const ship = ships[id]
+        const name = ship.api_name + (id >= enemyIdStartFrom && ship.api_yomi !== '-' ? (ship.api_yomi || '') : '')
+        const idZeroPadding = zeroPadding(id, 4)
+        const types = id >= enemyIdStartFrom ? imgTypesEnemy : imgTypes
+        const pathThisShip = path.join(dirPicsShips, `${id}`)
 
-            let isDownloadSuccess = true
+        await fs.ensureDir(pathThisShip)
 
-            // console.log(`  │       Fetching ${map[id]}.swf for ship [${id}] ${name}`)
-            // http://203.104.209.23/kcs/resources/swf/ships/aqgjvutybsbk.swf?VERSION=8
-            const downloadlink = `http://203.104.209.23/kcs/resources/swf/ships/${map[id]}.swf`
-            await getFile(
-                url.parse(downloadlink),
-                pathFile,
-                proxy
-            )
-                .catch(err => {
-                    isDownloadSuccess = false
-                    // console.log(err)
-                    // return reject(err)
-                    // reject(err)
-                    // console.log("  │       Fetched error: ", err)
-                })
-
-            if (!isDownloadSuccess) {
-                // console.log(`  │           Go next...`)
-            } else {
-                // console.log(`  │           Fetched.`)
-                // console.log(`  │           Decompiling swf for ship #${id}...`)
-                const dirPicsShipsExtractShip = path.join(dirPicsShipsExtract, '' + id)
-                await fs.ensureDir(dirPicsShipsExtractShip)
-                await new Promise(async (resolve, reject) => {
-                    jpexs.export({
-                        file: pathFile,
-                        output: dirPicsShipsExtractShip,
-                        items: [jpexs.ITEM.IMAGE],
-                        format: [jpexs.FORMAT.IMAGE.PNG],
-                        silence: true
-                    }, (err) => {
-                        if (err) {
-                            // console.log('Error: ', err.message)
-                            // resolve()
-                            reject(err)
-                        } else {
-                            resolve()
-                        }
-                    });
-                })
-                    .catch(err => {
-                        // console.log('Error: ', err)
-                        reject(err)
-                    })
-                // console.log(`  │           Decompiled -> /fetched_data/pics/ships/extract/${id}`)
-
-                fs.readdirSync(dirPicsShipsExtractShip).forEach(file => {
-                    const parsed = path.parse(file)
-                    const new_name = '_' + Math.floor(parseInt(parsed['name']) / 2) + parsed['ext'].toLowerCase()
-                    fs.renameSync(
-                        path.join(dirPicsShipsExtractShip, file),
-                        path.join(dirPicsShipsExtractShip, new_name)
-                    )
-                })
-                fs.readdirSync(dirPicsShipsExtractShip).forEach(file => {
-                    const parsed = path.parse(file)
-                    const new_name = parsed['name'].substr(1) + parsed['ext'].toLowerCase()
-                    fs.renameSync(
-                        path.join(dirPicsShipsExtractShip, file),
-                        path.join(dirPicsShipsExtractShip, new_name)
-                    )
-                })
-                // console.log(`  │           Renamed.`)
-
-                picsVersions[id] = picsVersionsNew[id]
-                fs.writeFileSync(
-                    filePicsVersions,
-                    JSON.stringify(picsVersions, undefined, 4)
-                )
-                // console.log(`  │           Updated pic version for ship #${id} -> /fetched_data/pics/ships/versions.json`)
-            }
-
-            if (typeof onProgress === 'function')
-                onProgress({
-                    ship: ship,
-                    index: completeIndex,
-                    length: needUpdate.length,
-                    complete: isDownloadSuccess,
-                    url: downloadlink,
-                })
-
-            completeIndex++
-            resolve()
-        })
-            .catch(err => reject(err))
+        for (let type of types) {
+            const url = `${apiOrigin}kcs2/resources/ship/${type}/${idZeroPadding}_${suffixUtils.create(id, `ship_${type}`)}.png?version=${picsVersionsNew[id]}`
+            const pathname = path.join(pathThisShip, `${type}.png`)
+            downloadList.push({
+                id, name, ship,
+                type,
+                url,
+                pathname,
+            })
+        }
     }
 
-    // fs.writeFileSync(
-    //     filePicsVersions,
-    //     jsonPretty(picsVersions)
-    // )
-    // console.log('  └── Updated pics versions -> /parsed/pics_versions.json')
-    // console.log('  └── Finished.')
-    return resolve()
-})
+    // console.log(downloadList)
+    // return
+    let lastShipId
+    for (let o of downloadList) {
+        let complete = true
+
+        await fetchFile(
+            url.parse(o.url),
+            o.pathname,
+            proxy
+        )
+            .catch(err => {
+                complete = false
+                // console.log(err)
+                // return reject(err)
+                // reject(err)
+                // console.log("  │       Fetched error: ", err)
+            })
+
+        if (lastShipId !== o.id) {
+            const versions = await fs.readJson(filePicsVersions)
+            versions[o.id] = picsVersionsNew[o.id]
+            await fs.writeJson(filePicsVersions, versions)
+            lastShipId = o.id
+        }
+
+        if (typeof onProgress === 'function')
+            onProgress({
+                ship: o.ship,
+                index: completeIndex,
+                length: downloadList.length,
+                complete,
+                url,
+            })
+
+        completeIndex++
+    }
+}

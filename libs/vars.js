@@ -29,4 +29,7 @@ module.exports = {
 
         apiStart2: path.resolve(process.cwd(), './.fetched_data/api_start2.json')
     },
+
+    strPaddingLength: 50,
+    strPaddingStr: '─'
 }

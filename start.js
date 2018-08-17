@@ -1,132 +1,29 @@
 #!/usr/bin/env node
 const argv = require('yargs').argv
-const fs = require('fs-extra')
-const path = require('path')
 
-const {
-    pathname,
-} = require('./libs/vars')
 const spinner = require('./libs/commons/spinner')
 const download = require('./libs/commons/download')
-
-const strPaddingLength = 50
-const strPaddingStr = '─'
+const {
+    strPaddingLength,
+    strPaddingStr
+} = require('./libs/vars')
 
 const logWIP = str => console.log('\x1b[31m' + '× \x1b[91m[WIP] \x1b[0m' + str)
 
 const run = async () => {
-    let token
-    let newpics = []
 
-    { // 确定访问DMM的token
-        if (argv.token)
-            token = argv.token
-        else if (Array.isArray(argv._) && argv._.length) {
-            token = argv._[0] + ''
-            if (token.substr(0, 6) == 'token=' ||
-                token.substr(0, 6) == 'token:')
-                token = token.substr(6)
-        }
-    }
+    const token = await require('./steps/get-token')(argv)
+    let newpics = []
 
     console.log(''.padEnd(strPaddingLength, strPaddingStr))
     console.log('')
 
-    /************************************************
-     * 确保内容存储目录和相关文件路径
-     ***********************************************/
-    {
-        fs.ensureDirSync(pathname.fetchedData)
-    }
+    await require('./steps/ensure-directories')()
+    await require('./steps/fetch-api-start2')(token)
+    await require('./steps/prepare-repositories')()
+    await require('./steps/download-pics-ships')()
 
-    /************************************************
-     * 如果提供了token，获取游戏API - start2
-     ***********************************************/
-    if (token) {
-        console.log(`\x1b[32m√\x1b[0m Token: ${token}`)
-
-        const step = '获取游戏API - start2'
-        const waiting = spinner(step)
-        const run = require('./libs/fetch-gameapi/start2')
-
-        await run({
-            token
-        })
-            .then(data => {
-                fs.writeFileSync(
-                    path.join(pathname.apiStart2),
-                    JSON.stringify(data, undefined, 4)
-                )
-                waiting.finish()
-                // console.log(data)
-            })
-            .catch(err => {
-                let msg = ''
-                if (err && err.message) {
-                    msg = err.message
-                } else if (err.api_result_msg) {
-                    if (err.api_result) {
-                        msg = `[${err.api_result}] ${err.api_result_msg}`
-                    } else
-                        msg = err.api_result_msg
-                }
-                waiting.fail(step + '\n  ' + msg)
-            })
-    }
-
-    /************************************************
-     * 检查api_start2.json
-     ***********************************************/
-    if (!fs.existsSync(pathname.apiStart2)) {
-        console.log('❌  终止! '.padEnd(strPaddingLength, strPaddingStr))
-        console.log('')
-
-        if (!token) {
-            console.log('请输入正确的命令')
-            console.log('npm start -- [token]')
-        } else {
-            console.log('获取 api_start2 发生错误!')
-        }
-
-        console.log('')
-        console.log(''.padEnd(strPaddingLength, strPaddingStr))
-        return
-    }
-
-    /************************************************
-     * 准备pics和database代码库
-     ***********************************************/
-    {
-        const step = '准备代码库'
-
-        const run = async type => {
-            const thisStep = step + ` (${type})`
-            const waiting = spinner(thisStep)
-            return require('./libs/commons/prepare-repo-dir')(type)
-                .then(() => waiting.finish())
-                .catch(err =>
-                    waiting.fail(thisStep + '\n  ' + (err.message || err))
-                )
-        }
-
-        await run('database')
-        await run('pics')
-    }
-
-    /************************************************
-     * 下载舰娘图片
-     ***********************************************/
-    {
-        try {
-            await download(
-                '下载舰娘图片',
-                require('./libs/fetch-pics/ships')
-            )
-        } catch (err) {
-            console.log(err)
-            throw err
-        }
-    }
+    return
 
     /************************************************
      * 下载装备图片
