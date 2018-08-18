@@ -20,11 +20,11 @@ const imgTypes = [
     // 'supply_character',
     // 'supply_character_dmg',
     'remodel',
-    // 'remodel_dmg',
+    'remodel_dmg',
     'banner',
-    // 'banner_dmg',
+    'banner_dmg',
     'card',
-    // 'card_dmg',
+    'card_dmg',
 ]
 const imgTypesEnemy = [
     'full',
@@ -32,6 +32,16 @@ const imgTypesEnemy = [
     'banner',
     // 'banner_dmg',
 ]
+const typeFileName = {
+    banner: 0,
+    banner_dmg: 1,
+    card: 2,
+    card_dmg: 3,
+    full: 6,
+    full_dmg: 7,
+    remodel: 10,
+    remodel_dmg: 11,
+}
 
 // http://203.104.209.23/kcs2/resources/ship/full/0406_6059.png?version=2
 
@@ -276,7 +286,7 @@ module.exports = async (onProgress, proxy) => {
 
         for (let type of types) {
             const url = getPicUrlShip(id, type, picsVersionsNew[id])
-            const pathname = path.join(pathThisShip, `${type}.png`)
+            const pathname = path.join(pathThisShip, `${typeFileName[type]}.png`)
             downloadList.push({
                 id, name, ship,
                 type,
