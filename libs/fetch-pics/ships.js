@@ -6,13 +6,12 @@ const {
     enemyIdStartFrom,
     pathname,
 } = require('../vars')
-const { World_17: apiOrigin } = require('../servers')
 
 const fetchFile = require('../commons/fetch-file')
-const zeroPadding = require('../commons/zero-padding')
-const suffixUtils = require('../commons/suffix-utils')
+const getPicUrlShip = require('../commons/get-pic-url-ship')
 
 const dirPicsShips = pathname.fetched.pics.ships
+const dirPicsEnemies = pathname.fetched.pics.enemies
 const fileApiStart2 = pathname.apiStart2
 const filePicsVersions = path.join(dirPicsShips, '../ships_versions.json')
 
@@ -64,6 +63,7 @@ fetched_data
 module.exports = async (onProgress, proxy) => {
 
     await fs.ensureDir(dirPicsShips)
+    await fs.ensureDir(dirPicsEnemies)
 
     if (!fs.existsSync(fileApiStart2))
         throw new Error('api_start2 不存在')
@@ -269,16 +269,16 @@ module.exports = async (onProgress, proxy) => {
     }
 
     for (let id of needUpdate) {
+        const isEnemy = (id >= enemyIdStartFrom)
         const ship = ships[id]
-        const name = ship.api_name + (id >= enemyIdStartFrom && ship.api_yomi !== '-' ? (ship.api_yomi || '') : '')
-        const idZeroPadding = zeroPadding(id, 4)
-        const types = id >= enemyIdStartFrom ? imgTypesEnemy : imgTypes
-        const pathThisShip = path.join(dirPicsShips, `${id}`)
+        const name = ship.api_name + (isEnemy && ship.api_yomi !== '-' ? (ship.api_yomi || '') : '')
+        const types = isEnemy ? imgTypesEnemy : imgTypes
+        const pathThisShip = path.join(isEnemy ? dirPicsEnemies : dirPicsShips, `${id}`)
 
         await fs.ensureDir(pathThisShip)
 
         for (let type of types) {
-            const url = `${apiOrigin}kcs2/resources/ship/${type}/${idZeroPadding}_${suffixUtils.create(id, `ship_${type}`)}.png?version=${picsVersionsNew[id]}`
+            const url = getPicUrlShip(id, type, picsVersionsNew[id])
             const pathname = path.join(pathThisShip, `${type}.png`)
             downloadList.push({
                 id, name, ship,

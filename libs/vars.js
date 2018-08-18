@@ -18,6 +18,7 @@ module.exports = {
         fetched: {
             pics: {
                 ships: path.resolve(process.cwd(), './.fetched_data/pics/ships'),
+                enemies: path.resolve(process.cwd(), './.fetched_data/pics/enemies'),
                 equipments: path.resolve(process.cwd(), './.fetched_data/pics/equipments'),
             }
         },
