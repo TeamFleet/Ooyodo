@@ -17,5 +17,8 @@ module.exports = (equipmentId, picType, picVersion) =>
     'card',
     'card_t',
     'item_on',
+    'item_character',
+    'item_up',
+    'statustop_item',
 ]
 */

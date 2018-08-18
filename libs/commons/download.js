@@ -27,7 +27,8 @@ module.exports = async (title, run) => {
     }
 
     await run(({
-        ship,
+        // ship, equipment,
+        id, name,
         // index,
         length,
         complete,
@@ -56,7 +57,8 @@ module.exports = async (title, run) => {
             completed++
         } else {
             failed.push({
-                ship,
+                // ship, equipment,
+                id, name,
                 url,
             })
         }
@@ -81,9 +83,9 @@ module.exports = async (title, run) => {
         failed.forEach(o => {
             console.log(
                 '  \x1b[31m' + '✦ ' + '\x1b[0m'
-                + o.ship.api_id
+                + o.id
                 + ' - '
-                + o.ship.api_name
+                + o.name
                 // + ` (${o.url})`
             )
         })

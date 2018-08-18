@@ -22,18 +22,9 @@ const run = async () => {
     await require('./steps/fetch-api-start2')(token)
     await require('./steps/prepare-repositories')()
     await require('./steps/download-pics-ships')()
+    await require('./steps/download-pics-equipments')()
 
     return
-
-    /************************************************
-     * 下载装备图片
-     ***********************************************/
-    {
-        await download(
-            '下载装备图片',
-            require('./libs/fetch-pics/equipments')
-        )
-    }
 
     /************************************************
      * 初始化database

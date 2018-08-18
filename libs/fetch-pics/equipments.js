@@ -1,21 +1,25 @@
 const path = require('path')
-const url = require('url')
 const fs = require('fs-extra')
 
 const {
     enemyEquipmentIdStartFrom,
     pathname,
 } = require('../vars')
-const getFile = require('../commons/get-file')
+const batch = require('./batch')
 
-/*
- * CARD     http://203.104.209.23/kcs/resources/image/slotitem/card/211.png
- * SPRITE   http://203.104.209.23/kcs/resources/image/slotitem/item_character/211.png
- * FULL     http://203.104.209.23/kcs/resources/image/slotitem/item_on/211.png
- * ITEM     http://203.104.209.23/kcs/resources/image/slotitem/item_up/211.png
- * TITLE    http://203.104.209.23/kcs/resources/image/slotitem/statustop_item/211.png
- */
+const getPicUrlEquipment = require('../commons/get-pic-url-equipment')
 
+const dirPicsEquipments = pathname.fetched.pics.equipments
+const fileApiStart2 = pathname.apiStart2
+const filePicsVersions = path.join(dirPicsEquipments, '../equipments_versions.json')
+
+const imgTypes = [
+    'card',
+    'item_on',
+    'item_character',
+    'item_up',
+    'statustop_item',
+]
 /*
 fetched_data
 `-- pics
@@ -29,8 +33,6 @@ fetched_data
         +-- 2
         `-- ...id
 */
-
-// const dirFetchedData = pathname.fetchedData
 
 /**
  * 获取装备图片资源
@@ -47,105 +49,74 @@ fetched_data
  * @param {number} obj.index - 当前完成的index
  * @param {number} obj.length - 有效总数
  */
-module.exports = async (onProgress, proxy) => new Promise(async (resolve, reject) => {
-    const dirPicsEquipments = pathname.fetched.pics.equipments
-    fs.ensureDirSync(dirPicsEquipments)
+module.exports = async (onProgress, proxy) => {
 
-    const fileApiStart2 = pathname.apiStart2
-    // console.log('  Fetching all equipments\' illustrations...')
+    await fs.ensureDir(dirPicsEquipments)
 
     if (!fs.existsSync(fileApiStart2))
-        return reject('api_start2 不存在')
+        throw new Error('api_start2 不存在')
 
-    const apiStart2 = fs.readJSONSync(fileApiStart2)
+    if (!fs.existsSync(filePicsVersions))
+        await fs.writeJson(filePicsVersions, {})
+
+    const picsVersions = await fs.readJSON(filePicsVersions) // 已存在的舰娘图片版本
+    const picsVersionsNew = {} // 更新后的舰娘图片版本
+    const downloadList = [] // 下载URL列表
+    const apiStart2 = await fs.readJSON(fileApiStart2)
+
     if (typeof apiStart2 !== 'object' ||
         typeof apiStart2.api_data !== 'object' ||
         typeof apiStart2.api_data.api_mst_slotitem !== 'object') {
-        return reject('api_start2.json 已损坏，请提供 token 以重新下载')
+        throw new Error('api_start2.json 已损坏，请提供 token 以重新下载')
     }
+
     let {
-        api_mst_slotitem: slotitem,
-    } = apiStart2.api_data
+        api_data: {
+            api_mst_slotitem: slotitem,
+        }
+    } = apiStart2
 
-    const pics = [
-        'card',
-        'item_character',
-        'item_on',
-        'item_up',
-        'statustop_item'
-    ]
-
-    slotitem = slotitem.filter(obj => {
+    const equipments = slotitem.filter(obj => {
         const id = parseInt(obj.api_id)
-        if (id >= enemyEquipmentIdStartFrom) {
+        if (id >= enemyEquipmentIdStartFrom)
             return false
-        }
-        const dir = path.join(dirPicsEquipments, '' + id)
-        if (fs.existsSync(dir)) {
-            // console.log(`  │       EXIST [${id}] ${name}`)
+
+        const version = parseInt(obj.api_version || 0)
+        if (version == picsVersions[id])
             return false
-        }
+
+        picsVersionsNew[id] = version
         return true
     })
 
-    let completeIndex = 0
-    let length = slotitem.length
-
-    for (let obj of slotitem) {
+    for (let obj of equipments) {
         const id = parseInt(obj.api_id)
-        // const name = obj.api_name
-        const dir = path.join(dirPicsEquipments, '' + id)
+        const name = obj.api_name
+        const pathThisEquipment = path.join(dirPicsEquipments, '' + id)
+        const picVsersion = obj.api_version || undefined
 
-        fs.ensureDirSync(dir)
-        await new Promise(async (resolve/*, reject*/) => {
-            // console.log(`  │       Fetching images for equipment [${id}] ${name}`)
+        await fs.ensureDir(pathThisEquipment)
 
-            let theId
-            if (id < 10) theId = '00' + id
-            else if (id < 100) theId = '0' + id
-            else theId = id
-
-            let fail = false
-
-            for (let type of pics) {
-                if (fail) continue
-                await getFile(
-                    url.parse(`http://203.104.209.23/kcs/resources/image/slotitem/${type}/${theId}.png`),
-                    path.join(dir, `${type}.png`),
-                    proxy
-                )
-                    .catch(err => {
-                        // isDownloadSuccess = false
-                        if (err == 404 || err.message == 404)
-                            return
-
-                        fail = true
-
-                        // 删除当前的目录
-                        fs.emptyDirSync(dir)
-                        fs.removeSync(dir)
-
-                        resolve(false)
-                        // reject(err)
-                        // console.log("  │       Fetched error: ", err)
-                    })
-                // .catch(err => console.log("  │       Fetched error:", err))
-                // console.log(`  │           ${id}/${type}.png`)
-            }
-
-            if (typeof onProgress === 'function')
-                onProgress({
-                    equipment: obj,
-                    index: completeIndex,
-                    length
-                })
-
-            completeIndex++
-            resolve()
-        })
-            .catch(err => reject(err))
+        for (let type of imgTypes) {
+            const url = getPicUrlEquipment(id, type, picVsersion)
+            const pathname = path.join(pathThisEquipment, `${type}.png`)
+            // let complete = true
+            downloadList.push({
+                id, name,
+                equipment: obj,
+                type,
+                url,
+                pathname,
+                version: picsVersionsNew[id]
+            })
+        }
     }
 
-    // console.log('  └── Finished.')
-    resolve()
-})
+    await batch(
+        downloadList,
+        onProgress,
+        filePicsVersions,
+        proxy,
+    )
+
+}

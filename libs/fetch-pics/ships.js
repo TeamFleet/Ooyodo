@@ -1,13 +1,12 @@
 const path = require('path')
-const url = require('url')
 const fs = require('fs-extra')
 
 const {
     enemyIdStartFrom,
     pathname,
 } = require('../vars')
+const batch = require('./batch')
 
-const fetchFile = require('../commons/fetch-file')
 const getPicUrlShip = require('../commons/get-pic-url-ship')
 
 const dirPicsShips = pathname.fetched.pics.ships
@@ -78,8 +77,6 @@ module.exports = async (onProgress, proxy) => {
     const picsVersionsNew = {} // 更新后的舰娘图片版本
     const downloadList = [] // 下载URL列表
     const apiStart2 = await fs.readJSON(fileApiStart2)
-
-    let completeIndex = 0
 
     if (typeof apiStart2 !== 'object' ||
         typeof apiStart2.api_data !== 'object' ||
@@ -285,45 +282,15 @@ module.exports = async (onProgress, proxy) => {
                 type,
                 url,
                 pathname,
+                version: picsVersionsNew[id],
             })
         }
     }
 
-    // console.log(downloadList)
-    // return
-    let lastShipId
-    for (let o of downloadList) {
-        let complete = true
-
-        await fetchFile(
-            url.parse(o.url),
-            o.pathname,
-            proxy
-        )
-            .catch(err => {
-                complete = false
-                // console.log(err)
-                // return reject(err)
-                // reject(err)
-                // console.log("  │       Fetched error: ", err)
-            })
-
-        if (lastShipId !== o.id) {
-            const versions = await fs.readJson(filePicsVersions)
-            versions[o.id] = picsVersionsNew[o.id]
-            await fs.writeJson(filePicsVersions, versions)
-            lastShipId = o.id
-        }
-
-        if (typeof onProgress === 'function')
-            onProgress({
-                ship: o.ship,
-                index: completeIndex,
-                length: downloadList.length,
-                complete,
-                url,
-            })
-
-        completeIndex++
-    }
+    await batch(
+        downloadList,
+        onProgress,
+        filePicsVersions,
+        proxy,
+    )
 }
