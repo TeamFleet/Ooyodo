@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 const argv = require('yargs').argv
+const chalk = require('chalk')
 
 const spinner = require('./libs/commons/spinner')
 const {
@@ -11,18 +12,24 @@ const logWIP = str => console.log('\x1b[31m' + '× \x1b[91m[WIP] \x1b[0m' + str)
 
 const run = async () => {
 
-    const token = await require('./steps/get-token')(argv)
-    let newpics = []
-
     console.log(''.padEnd(strPaddingLength, strPaddingStr))
     console.log('')
+    console.log(chalk.cyanBright('Ooyodo'))
+    console.log('')
 
+    const token = await require('./steps/get-token')(argv)
     await require('./steps/ensure-directories')()
     await require('./steps/fetch-api-start2')(token)
     await require('./steps/prepare-repositories')()
     await require('./steps/download-pics-ships')()
     await require('./steps/download-pics-equipments')()
     await require('./steps/initialize-database')()
+    const newpics = []
+
+    console.log('')
+    console.log('\x1b[36m' + '完成!' + '\x1b[0m')
+    console.log('')
+    console.log(''.padEnd(strPaddingLength, strPaddingStr))
 
     return
 
@@ -152,10 +159,6 @@ const run = async () => {
         logWIP('更新database')
     }
 
-    console.log('')
-    console.log('\x1b[36m' + '完成!' + '\x1b[0m')
-    console.log('')
-    console.log(''.padEnd(strPaddingLength, strPaddingStr))
 }
 
 run()
