@@ -13,7 +13,7 @@ const {
  * @async
  */
 module.exports = async () => {
-    const step = '初始化database'
+    const step = '初始化 database'
     const waiting = spinner(step)
 
     const raw = {}

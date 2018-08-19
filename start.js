@@ -8,6 +8,8 @@ const {
     strPaddingStr
 } = require('./libs/vars')
 
+const isKC2Transition = true
+
 const logWIP = str => console.log('\x1b[31m' + '× \x1b[91m[WIP] \x1b[0m' + str)
 
 const run = async () => {
@@ -24,7 +26,13 @@ const run = async () => {
     await require('./steps/download-pics-ships')()
     await require('./steps/download-pics-equipments')()
     await require('./steps/initialize-database')()
-    const newpics = []
+
+    if (isKC2Transition) {
+        console.log('\n' + chalk.redBright('当前为 KC2 过渡期'))
+        await require('./steps/kc2-transition')()
+    } else {
+        const newpics = []
+    }
 
     console.log('')
     console.log('\x1b[36m' + '完成!' + '\x1b[0m')
