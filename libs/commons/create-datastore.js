@@ -1,5 +1,6 @@
 const path = require('path')
-const nedb = require('nedb-promise')
+const Datastore = require('nedb')
+const nedbPromise = require('nedb-promise')
 
 const { pathname } = require('../vars')
 
@@ -8,7 +9,14 @@ const initNedb = (dbnames = []) => {
     for (let o of dbnames) {
         const dbname = Array.isArray(o) ? o[0] : o
         const filename = Array.isArray(o) ? o[1] : o
-        db[dbname] = nedb({
+        // const store = Datastore({
+        //     filename: path.resolve(pathname.repoDatabase, 'db', `${filename}.nedb`),
+        //     autoload: true,
+        // })
+        // const db = nedbPromise.fromInstance(store)
+        // db.persistence = store.persistence
+        // db[dbname] = db
+        db[dbname] = nedbPromise({
             filename: path.resolve(pathname.repoDatabase, 'db', `${filename}.nedb`),
             autoload: true,
         })

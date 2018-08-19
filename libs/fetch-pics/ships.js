@@ -37,8 +37,8 @@ const typeFileName = {
     banner_dmg: 1,
     card: 2,
     card_dmg: 3,
-    full: 6,
-    full_dmg: 7,
+    full: 8,
+    full_dmg: 9,
     remodel: 10,
     remodel_dmg: 11,
 }
