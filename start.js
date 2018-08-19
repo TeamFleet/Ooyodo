@@ -2,7 +2,6 @@
 const argv = require('yargs').argv
 
 const spinner = require('./libs/commons/spinner')
-const download = require('./libs/commons/download')
 const {
     strPaddingLength,
     strPaddingStr
@@ -23,26 +22,9 @@ const run = async () => {
     await require('./steps/prepare-repositories')()
     await require('./steps/download-pics-ships')()
     await require('./steps/download-pics-equipments')()
+    await require('./steps/initialize-database')()
 
     return
-
-    /************************************************
-     * 初始化database
-     ***********************************************/
-    {
-        const step = '初始化database'
-        const waiting = spinner(step)
-        const run = require('./libs/commons/init-db')
-        await run()
-            .then(() => waiting.finish())
-            .catch(err =>
-                waiting.fail(step + '\n  ' + (err.message || err))
-            )
-        // const {
-        //     db,
-        // } = require('./libs/vars')
-        // console.log(db)
-    }
 
     /************************************************
      * 查找新的舰娘图片
