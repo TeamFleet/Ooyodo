@@ -12,7 +12,7 @@ const getPicUrlShip = require('../commons/get-pic-url-ship')
 const dirPicsShips = pathname.fetched.pics.ships
 const dirPicsEnemies = pathname.fetched.pics.enemies
 const fileApiStart2 = pathname.apiStart2
-const filePicsVersions = path.join(dirPicsShips, '../ships_versions.json')
+const filePicsVersions = pathname.fetched.versions.ships
 
 const imgTypes = [
     'full',

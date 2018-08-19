@@ -20,6 +20,10 @@ module.exports = {
                 ships: path.resolve(process.cwd(), './.fetched_data/pics/ships'),
                 enemies: path.resolve(process.cwd(), './.fetched_data/pics/enemies'),
                 equipments: path.resolve(process.cwd(), './.fetched_data/pics/equipments'),
+            },
+            versions: {
+                ships: path.resolve(process.cwd(), './.fetched_data/pics/ships_versions.json'),
+                equipments: path.resolve(process.cwd(), './.fetched_data/pics/equipments_versions.json'),
             }
         },
 

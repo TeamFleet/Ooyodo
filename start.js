@@ -22,13 +22,12 @@ const run = async () => {
     const token = await require('./steps/get-token')(argv)
     await require('./steps/ensure-directories')()
     await require('./steps/fetch-api-start2')(token)
-    await require('./steps/prepare-repositories')()
+    // await require('./steps/prepare-repositories')()
     await require('./steps/download-pics-ships')()
     await require('./steps/download-pics-equipments')()
     await require('./steps/initialize-database')()
 
     if (isKC2Transition) {
-        console.log('\n' + chalk.redBright('当前为 KC2 过渡期'))
         await require('./steps/kc2-transition')()
     } else {
         const newpics = []

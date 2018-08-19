@@ -11,7 +11,7 @@ const getPicUrlEquipment = require('../commons/get-pic-url-equipment')
 
 const dirPicsEquipments = pathname.fetched.pics.equipments
 const fileApiStart2 = pathname.apiStart2
-const filePicsVersions = path.join(dirPicsEquipments, '../equipments_versions.json')
+const filePicsVersions = pathname.fetched.versions.equipments
 
 const imgTypes = [
     'card',
