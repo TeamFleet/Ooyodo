@@ -22,7 +22,7 @@ const run = async () => {
     const token = await require('./steps/get-token')(argv)
     await require('./steps/ensure-directories')()
     await require('./steps/fetch-api-start2')(token)
-    // await require('./steps/prepare-repositories')()
+    await require('./steps/prepare-repositories')()
     await require('./steps/download-pics-ships')()
     await require('./steps/download-pics-equipments')()
     await require('./steps/initialize-database')()
