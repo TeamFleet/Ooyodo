@@ -21,8 +21,7 @@ module.exports = async (
             proxy
         )
             .catch(err => {
-                complete = false
-                // console.log(err)
+                if (err != 404) complete = false
                 // return reject(err)
                 // reject(err)
                 // console.log("  │       Fetched error: ", err)

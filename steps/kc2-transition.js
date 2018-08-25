@@ -36,7 +36,8 @@ module.exports = async () => {
     stepPrepration.finish()
 
     // 删除 pics repo 中多余的图片
-    {
+    const doDeleteRepo = false
+    if (doDeleteRepo) {
         const stepRemoveShipPics = spinner('删除 pics repo 中多余的图片')
         const remove = async (root, filesToRemove) => {
             const dirs = (await fs.readdir(root))
@@ -117,7 +118,8 @@ module.exports = async () => {
     }
 
     // 图片更名
-    {
+    const doRename = false
+    if (doRename) {
         const step = spinner('图片更名')
         const pairs = [
             ['6.png', '8.png'],
@@ -150,7 +152,8 @@ module.exports = async () => {
     }
 
     // 更新数据：舰娘图鉴版本
-    {
+    const doUpdateShipsVersions = true
+    if (doUpdateShipsVersions) {
         const stepShipsUpdatePicVersion = spinner('更新数据：舰娘图鉴版本')
         // console.log(db.ships)
         for (let id of shipIds) {
@@ -175,8 +178,9 @@ module.exports = async () => {
         stepShipsUpdatePicVersion.finish()
     }
 
-    /* 复制 ships-extra 目录内容到 ships
-    {
+    // 复制 ships-extra 目录内容到 ships
+    const doCopyExtra = false
+    if (doCopyExtra) {
         const stepShipsCopyExtras = spinner('复制文件：extra')
         const dirs = (await fs.readdir(dirKC2ShipsExtra))
             .filter(filename => {
@@ -203,14 +207,14 @@ module.exports = async () => {
         }
         stepShipsCopyExtras.finish()
     }
-    */
 
     // 遍历 ship_series
     //  a. 删除 1.png、2.png、3.png、11.png
     //  b. 如果为改造版本且存在 6.png、7.png，比对 6.png、7.png 和前一个版本是否相同
     //         * 如果相同，删除该文件夹内的 6.png、7.png，同时标记 db 内的相关字段
     //         * 如果不相同，移除 db 内的相关字段
-    {
+    const doIterateSeries = true
+    if (doIterateSeries) {
         const stepShipsUpdateSameAsPrev = spinner('更新数据：舰娘图鉴是否和前一个改造版本相同')
         const filesToHash = [
             '8.png', '9.png'
@@ -298,7 +302,8 @@ module.exports = async () => {
     }
 
     // 保存数据
-    {
+    const doCompactNeDBs = true
+    if (doCompactNeDBs) {
         const stepCompactNeDBs = spinner('保存数据')
         for (let store of Object.values(db)) {
             store.nedb.persistence.compactDatafile()
@@ -309,8 +314,9 @@ module.exports = async () => {
         stepCompactNeDBs.succeed()
     }
 
-    // 复制舰娘图片至 pics repo
-    {
+    // 复制图片至 pics repo
+    const doCopyPics = true
+    if (doCopyPics) {
         const step = spinner('复制图片')
         const copy = async (from, dest, filesToCopy) => {
             const ids = (await fs.readdir(from))
@@ -339,7 +345,10 @@ module.exports = async () => {
             dirKC2Ships,
             path.resolve(pathname.repoPics, 'dist', 'ships'),
             [
-                '0.png', '2.png', '8.png', '9.png', '10.png'
+                '0.png', '1.png',
+                '2.png', '3.png',
+                // '8.png', '9.png',
+                '10.png', '11.png'
             ]
         )
         await copy(
@@ -353,7 +362,8 @@ module.exports = async () => {
             dirKC2Equipments,
             path.resolve(pathname.repoPics, 'dist', 'equipments'),
             [
-                'card.png'
+                'card.png',
+                'item_character.png', 'item_on.png', 'item_up.png'
             ]
         )
         step.succeed()
