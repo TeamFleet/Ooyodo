@@ -227,7 +227,7 @@ module.exports = async () => {
                     if (value) {
                         return {
                             '$set': {
-                                illust_same_as_prev: 'on'
+                                illust_same_as_prev: true
                             }
                         }
                     } else {
@@ -301,6 +301,12 @@ module.exports = async () => {
         stepShipsUpdateSameAsPrev.finish()
     }
 
+    // 更新装备数据：图片版本
+    const doUpdateEquipmentsVersions = true
+    if (doUpdateEquipmentsVersions) {
+
+    }
+
     // 保存数据
     const doCompactNeDBs = true
     if (doCompactNeDBs) {
@@ -315,7 +321,7 @@ module.exports = async () => {
     }
 
     // 复制图片至 pics repo
-    const doCopyPics = true
+    const doCopyPics = false
     if (doCopyPics) {
         const step = spinner('复制图片')
         const copy = async (from, dest, filesToCopy) => {
@@ -369,8 +375,5 @@ module.exports = async () => {
         step.succeed()
     }
 
-    /* 装备
-        1. 仅保留 card.png
-        2. 依照 api_start2 的结果更新 db 的图鉴版本
-    */
+    
 }
