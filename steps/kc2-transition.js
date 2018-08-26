@@ -5,7 +5,11 @@ const md5File = require('md5-file')
 
 const spinner = require('../libs/commons/spinner')
 const createDatastore = require('../libs/commons/create-datastore')
-const { db: data, pathname, enemyIdStartFrom } = require('../libs/vars')
+const {
+    db: data,
+    pathname,
+    enemyIdStartFrom, enemyEquipmentIdStartFrom,
+} = require('../libs/vars')
 const confirmedSameAsPrev = require('../libs/ships-pic-same-as-prev')
 
 const dirKC2 = path.resolve(__dirname, '../.kc2')
@@ -31,6 +35,9 @@ module.exports = async () => {
 
     const shipIds = Object.keys(data.ships)
         .filter(id => id < enemyIdStartFrom)
+        .map(id => parseInt(id))
+    const equipmentIds = Object.keys(data.equipments)
+        .filter(id => id < enemyEquipmentIdStartFrom)
         .map(id => parseInt(id))
 
     stepPrepration.finish()
@@ -304,7 +311,28 @@ module.exports = async () => {
     // 更新装备数据：图片版本
     const doUpdateEquipmentsVersions = true
     if (doUpdateEquipmentsVersions) {
-
+        const stepEquipmentsUpdatePicVersion = spinner('更新数据：装备图鉴版本')
+        // console.log(db.ships)
+        for (let id of equipmentIds) {
+            const picVersion = picVersionsEquipments[id] || 0
+            // const ship = await db.ships.find({ id })
+            const update = {}
+            if (picVersion) {
+                update['$set'] = {
+                    illust_version: picVersion
+                }
+            } else {
+                update['$unset'] = {
+                    illust_version: true
+                }
+            }
+            await db.equipments.update(
+                { id },
+                update
+            )
+            // console.log(id, picVersion, ship)
+        }
+        stepEquipmentsUpdatePicVersion.finish()
     }
 
     // 保存数据
@@ -375,5 +403,5 @@ module.exports = async () => {
         step.succeed()
     }
 
-    
+
 }
