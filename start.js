@@ -36,7 +36,7 @@ const run = async () => {
     await require('./steps/dist')()
 
     console.log('')
-    console.log('\x1b[36m' + '完成!' + '\x1b[0m')
+    console.log(chalk.greenBright('完成'))
     console.log('')
     console.log(''.padEnd(strPaddingLength, strPaddingStr))
 
