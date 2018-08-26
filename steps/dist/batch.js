@@ -10,6 +10,7 @@ const {
     },
 } = require('../../libs/vars')
 const spinner = require('../../libs/commons/spinner')
+const wait = require('../../libs/commons/wait')
 
 const getFolder = (type, category, id) => {
     switch (type) {
@@ -79,6 +80,7 @@ module.exports = async (title, list = []) => {
             })
         }
         bar.tick()
+        await wait(10)
     }
 
     clearInterval(intervalSpinner)
