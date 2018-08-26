@@ -68,16 +68,18 @@ module.exports = async (title, list = []) => {
         const from = path.resolve(repoPics, 'dist', category, '' + id, '' + filename)
         const to = getFolder(type, category, id)
         const dest = path.resolve(to, filename)
-        try {
-            await fs.ensureDir(to)
-            await fs.copyFile(from, dest)
-        } catch (error) {
-            if (fs.existsSync(dest))
-                await fs.remove(path.resolve(to, filename))
-            failed.push({
-                ...o,
-                error
-            })
+        if (fs.existsSync(from)) {
+            try {
+                await fs.ensureDir(to)
+                await fs.copyFile(from, dest)
+            } catch (error) {
+                if (fs.existsSync(dest))
+                    await fs.remove(path.resolve(to, filename))
+                failed.push({
+                    ...o,
+                    error
+                })
+            }
         }
         bar.tick()
         await wait(10)
