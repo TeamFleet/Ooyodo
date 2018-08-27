@@ -37,13 +37,22 @@ module.exports = async () => {
         .sort((a, b) => a - b)
 
     for (let id of ids) {
+        const group = (() => {
+            let index = 200
+            let multiplier = 1
+            while (index * multiplier < id) {
+                multiplier++
+            }
+            return multiplier
+        })()
         for (let type of Object.keys(picsNames)) {
             for (let filename of picsNames[type]) {
                 list.push({
                     category: 'ships-extra',
                     type,
-                    id: id,
+                    id,
                     filename,
+                    group,
                 })
             }
         }

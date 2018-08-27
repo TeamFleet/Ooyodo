@@ -12,25 +12,26 @@ const {
 const spinner = require('../../libs/commons/spinner')
 const wait = require('../../libs/commons/wait')
 
-const getFolder = (type, category, id) => {
+const getFolder = (type, category, id, group) => {
+    group = group ? `-${group}` : ''
     switch (type) {
         case 'app': {
             if (category === 'equipments')
-                return path.resolve(dirs[type], 'pics/items', '' + id)
-            return path.resolve(dirs[type], `pics-${category}`, '' + id)
+                return path.resolve(dirs[type], `pics/items${group}`, '' + id)
+            return path.resolve(dirs[type], `pics-${category}${group}`, '' + id)
         }
         case 'webApp': {
             if (category === 'equipments')
-                return path.resolve(dirs[type], 'pics/items', '' + id)
+                return path.resolve(dirs[type], `pics/items${group}`, '' + id)
             if (category === 'entities')
-                return path.resolve(dirs[type], 'pics/entities', '' + id)
-            return path.resolve(dirs[type], `pics-${category}`, '' + id)
+                return path.resolve(dirs[type], `pics/entities${group}`, '' + id)
+            return path.resolve(dirs[type], `pics-${category}${group}`, '' + id)
         }
         case 'pwa': {
-            return path.resolve(dirs[type], category, '' + id)
+            return path.resolve(dirs[type], `${category}${group}`, '' + id)
         }
     }
-    return path.resolve(dirs[type], category, '' + id)
+    return path.resolve(dirs[type], `${category}${group}`, '' + id)
 }
 
 module.exports = async (title, list = []) => {
@@ -63,10 +64,11 @@ module.exports = async (title, list = []) => {
             category,
             type,
             id,
-            filename
+            filename,
+            group,
         } = o
         const from = path.resolve(repoPics, 'dist', category, '' + id, '' + filename)
-        const to = getFolder(type, category, id)
+        const to = getFolder(type, category, id, group)
         const dest = path.resolve(to, filename)
         if (fs.existsSync(from)) {
             try {

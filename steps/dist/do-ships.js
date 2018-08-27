@@ -38,6 +38,15 @@ module.exports = async () => {
     for (let series of allSeries) {
         for (let ship of series.ships) {
             const sameAsPrev = ship.illust_delete ? true : false
+            const id = ship.id
+            const group = (() => {
+                let index = 200
+                let multiplier = 1
+                while (index * multiplier < id) {
+                    multiplier++
+                }
+                return multiplier
+            })()
             for (let type of Object.keys(picsNames)) {
                 for (let filename of picsNames[type]) {
                     if (sameAsPrev && sameAsPrevPicIdsIgnore.some(id => filename.includes(`${id}.`)))
@@ -45,8 +54,9 @@ module.exports = async () => {
                     list.push({
                         category: 'ships',
                         type,
-                        id: ship.id,
+                        id,
                         filename,
+                        group
                     })
                 }
             }
