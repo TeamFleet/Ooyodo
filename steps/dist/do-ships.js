@@ -1,6 +1,7 @@
 const createDatastore = require('../../libs/commons/create-datastore')
 const spinner = require('../../libs/commons/spinner')
 const batch = require('./batch')
+const getFolderGroup = require('./get-folder-group')
 
 module.exports = async () => {
     const title = '舰娘'
@@ -39,14 +40,7 @@ module.exports = async () => {
         for (let ship of series.ships) {
             const sameAsPrev = ship.illust_delete ? true : false
             const id = ship.id
-            const group = (() => {
-                let index = 200
-                let multiplier = 1
-                while (index * multiplier < id) {
-                    multiplier++
-                }
-                return multiplier
-            })()
+            const group = getFolderGroup(id)
             for (let type of Object.keys(picsNames)) {
                 for (let filename of picsNames[type]) {
                     if (sameAsPrev && sameAsPrevPicIdsIgnore.some(id => filename.includes(`${id}.`)))

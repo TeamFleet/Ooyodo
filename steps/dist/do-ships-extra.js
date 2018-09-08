@@ -8,6 +8,7 @@ const {
 } = require('../../libs/vars')
 const spinner = require('../../libs/commons/spinner')
 const batch = require('./batch')
+const getFolderGroup = require('./get-folder-group')
 
 module.exports = async () => {
     const title = '舰娘限定'
@@ -37,14 +38,7 @@ module.exports = async () => {
         .sort((a, b) => a - b)
 
     for (let id of ids) {
-        const group = (() => {
-            let index = 200
-            let multiplier = 1
-            while (index * multiplier < id) {
-                multiplier++
-            }
-            return multiplier
-        })()
+        const group = getFolderGroup(id)
         for (let type of Object.keys(picsNames)) {
             for (let filename of picsNames[type]) {
                 list.push({

@@ -349,7 +349,7 @@ module.exports = async () => {
     }
 
     // 复制图片至 pics repo
-    const doCopyPics = false
+    const doCopyPics = true
     if (doCopyPics) {
         const step = spinner('复制图片')
         const copy = async (from, dest, filesToCopy) => {

@@ -13,25 +13,25 @@ const spinner = require('../../libs/commons/spinner')
 const wait = require('../../libs/commons/wait')
 
 const getFolder = (type, category, id, group) => {
-    group = group ? `-${group}` : ''
     switch (type) {
         case 'app': {
+            group = group ? `-${group}` : ''
             if (category === 'equipments')
                 return path.resolve(dirs[type], `pics/items${group}`, '' + id)
             return path.resolve(dirs[type], `pics-${category}${group}`, '' + id)
         }
         case 'webApp': {
             if (category === 'equipments')
-                return path.resolve(dirs[type], `pics/items${group}`, '' + id)
+                return path.resolve(dirs[type], `pics/items`, '' + id)
             if (category === 'entities')
-                return path.resolve(dirs[type], `pics/entities${group}`, '' + id)
-            return path.resolve(dirs[type], `pics-${category}${group}`, '' + id)
+                return path.resolve(dirs[type], `pics/entities`, '' + id)
+            return path.resolve(dirs[type], `pics-${category}`, '' + id)
         }
         case 'pwa': {
-            return path.resolve(dirs[type], `${category}${group}`, '' + id)
+            return path.resolve(dirs[type], `${category}`, '' + id)
         }
     }
-    return path.resolve(dirs[type], `${category}${group}`, '' + id)
+    return path.resolve(dirs[type], `${category}`, '' + id)
 }
 
 module.exports = async (title, list = []) => {
