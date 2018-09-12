@@ -23,6 +23,7 @@ const dirKC2Enemies = path.resolve(dirKC2, 'enemies')
  * @async
  */
 module.exports = async () => {
+    // return true
     console.log('\n' + chalk.redBright('当前为 KC2 过渡期'))
 
     const stepPrepration = spinner('准备数据')
@@ -349,7 +350,7 @@ module.exports = async () => {
     }
 
     // 复制图片至 pics repo
-    const doCopyPics = true
+    const doCopyPics = false
     if (doCopyPics) {
         const step = spinner('复制图片')
         const copy = async (from, dest, filesToCopy) => {
