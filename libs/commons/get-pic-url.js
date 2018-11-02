@@ -7,9 +7,10 @@ const suffixUtils = require('./suffix-utils')
  * @param {String|Number} id 项目ID
  * @param {String} picType 图片类型
  * @param {String|Number} [picVersion] 图片版本号
+ * @param {String[]} [extraSegs] 扩展名之前添加的额外字符串
  * @returns {String} 图片URL
  */
-module.exports = (itemType, id, picType, picVersion) => {
+module.exports = (itemType, id, picType, picVersion, extraSegs = []) => {
     switch (itemType.toLowerCase()) {
         case 'ships': {
             itemType = 'ship'
@@ -29,6 +30,8 @@ module.exports = (itemType, id, picType, picVersion) => {
 
     return `${apiOrigin}kcs2/resources/`
         + `${itemType}/${picType}/`
-        + `${id}_${suffixUtils.create(id, `${itemType}_${picType}`)}.png`
+        + `${id}_${suffixUtils.create(id, `${itemType}_${picType}`)}`
+        + extraSegs.map(str => `_${str}`).join('')
+        + `.png`
         + (picVersion ? `?version=${picVersion}` : '')
 }

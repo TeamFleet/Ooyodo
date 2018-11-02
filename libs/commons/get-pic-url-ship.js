@@ -6,10 +6,11 @@ const zeroPadding = require('./zero-padding')
  * @param {String|Number} shipId 舰娘ID
  * @param {String} picType 图片类型
  * @param {String|Number} [picVersion] 图片版本号
+ * @param {String[]} [extraSegs] 扩展名之前添加的额外字符串
  * @returns {String} 图片URL
  */
-module.exports = (shipId, picType, picVersion) =>
-    getPicUrl('ship', zeroPadding(shipId, 4), picType, picVersion)
+module.exports = (shipId, picType, picVersion, extraSegs) =>
+    getPicUrl('ship', zeroPadding(shipId, 4), picType, picVersion, extraSegs)
 
 /*
 可用图片类型

@@ -1,5 +1,6 @@
 const path = require('path')
 const fs = require('fs-extra')
+const md5File = require('md5-file')
 
 const {
     enemyIdStartFrom,
@@ -10,6 +11,7 @@ const batch = require('./batch')
 const getPicUrlShip = require('../commons/get-pic-url-ship')
 
 const dirPicsShips = pathname.fetched.pics.ships
+const dirPicsShipsExtra = pathname.fetched.pics.shipsExtra
 const dirPicsEnemies = pathname.fetched.pics.enemies
 const fileApiStart2 = pathname.apiStart2
 const filePicsVersions = pathname.fetched.versions.ships
@@ -25,6 +27,11 @@ const imgTypes = [
     'banner_dmg',
     'card',
     'card_dmg',
+    'special',
+]
+const imgTypesHoliday = [
+    'full',
+    'full_dmg'
 ]
 const imgTypesEnemy = [
     'full',
@@ -286,7 +293,10 @@ module.exports = async (onProgress, proxy) => {
 
         for (let type of types) {
             const url = getPicUrlShip(id, type, picsVersionsNew[id])
-            const pathname = path.join(pathThisShip, `${typeFileName[type]}.png`)
+            const pathname = path.join(
+                pathThisShip,
+                `${type in typeFileName ? typeFileName[type] : type}.png`
+            )
             downloadList.push({
                 id, name, ship,
                 type,
@@ -294,6 +304,34 @@ module.exports = async (onProgress, proxy) => {
                 pathname,
                 version: picsVersionsNew[id],
             })
+        }
+
+        // 友方舰娘额外图片
+        if (!isEnemy) {
+            for (let type of imgTypesHoliday) {
+                const dir = path.resolve(dirPicsShipsExtra, `_${id}`)
+                const picId = type in typeFileName ? typeFileName[type] : type
+                const saveTo = path.resolve(dir, `${picId}.png`)
+                await fs.ensureDir(dir)
+                downloadList.push({
+                    id, name, ship,
+                    type,
+                    url: getPicUrlShip(id, type, picsVersionsNew[id], [map[id]]),
+                    pathname: saveTo,
+                    version: picsVersionsNew[id],
+                    ignore404: true,
+                    // onFail: async () => {
+                    //     await fs.remove(dir)
+                    // },
+                    onFetch: () => {
+                        // 该文件下载完成后，对比标准图片，如果相同，删除
+                        const md5Original = md5File.sync(path.resolve(dirPicsShips, `${id}`, `${picId}.png`))
+                        const md5This = md5File.sync(saveTo)
+                        if (md5Original === md5This)
+                            fs.removeSync(saveTo)
+                    }
+                })
+            }
         }
     }
 
@@ -303,4 +341,16 @@ module.exports = async (onProgress, proxy) => {
         filePicsVersions,
         proxy,
     )
+
+    // 检查 extra 目录下的每个文件夹，如果发现有空目录，清除
+    {
+        const dirs = (await fs.readdir(dirPicsShipsExtra))
+            .map(filename => path.resolve(dirPicsShipsExtra, filename))
+            .filter(pathname => fs.lstatSync(pathname).isDirectory())
+            .filter(pathname => !fs.readdirSync(pathname).length)
+        for (let dir of dirs) {
+            // console.log(dir)
+            await fs.remove(dir)
+        }
+    }
 }
