@@ -14,26 +14,44 @@ const logWIP = str => console.log('\x1b[31m' + '× \x1b[91m[WIP] \x1b[0m' + str)
 
 const run = async () => {
 
+    let isOnlyDownload = false
+    const argvs = Array.isArray(argv._)
+        ? argv._.filter(arg => {
+            if (arg === 'only-download') {
+                isOnlyDownload = true
+                return false
+            }
+            return true
+        })
+        : []
+
     console.log(''.padEnd(strPaddingLength, strPaddingStr))
     console.log('')
     console.log(chalk.cyanBright('Ooyodo'))
     console.log('')
 
-    const token = await require('./steps/get-token')(argv)
-    await require('./steps/ensure-directories')()
-    await require('./steps/fetch-api-start2')(token)
-    await require('./steps/prepare-repositories')()
-    await require('./steps/download-pics-ships')()
-    await require('./steps/download-pics-equipments')()
-    await require('./steps/initialize-database')()
+    const token = await require('./steps/get-token')(argvs)
 
-    if (isKC2Transition) {
-        await require('./steps/kc2-transition')()
-    } else {
-        const newpics = []
+    if (!isOnlyDownload) {
+        await require('./steps/ensure-directories')()
+        await require('./steps/fetch-api-start2')(token)
+        await require('./steps/prepare-repositories')()
     }
 
-    await require('./steps/dist')()
+    await require('./steps/download-pics-ships')()
+    await require('./steps/download-pics-equipments')()
+
+    if (!isOnlyDownload) {
+        await require('./steps/initialize-database')()
+
+        if (isKC2Transition) {
+            await require('./steps/kc2-transition')()
+        } else {
+            const newpics = []
+        }
+
+        await require('./steps/dist')()
+    }
 
     console.log('')
     console.log(chalk.greenBright('完成'))

@@ -29,10 +29,10 @@ const imgTypes = [
     'card_dmg',
     'special',
 ]
-const imgTypesHoliday = [
-    'full',
-    'full_dmg'
-]
+// const imgTypesHoliday = [
+//     'full',
+//     'full_dmg'
+// ]
 const imgTypesEnemy = [
     'full',
     // 'full_dmg',
@@ -79,6 +79,7 @@ fetched_data
 module.exports = async (onProgress, proxy) => {
 
     await fs.ensureDir(dirPicsShips)
+    await fs.ensureDir(dirPicsShipsExtra)
     await fs.ensureDir(dirPicsEnemies)
 
     if (!fs.existsSync(fileApiStart2))
@@ -292,7 +293,7 @@ module.exports = async (onProgress, proxy) => {
         await fs.ensureDir(pathThisShip)
 
         for (let type of types) {
-            const url = getPicUrlShip(id, type, picsVersionsNew[id])
+            const url = getPicUrlShip(id, type, picsVersionsNew[id], [map[id]])
             const pathname = path.join(
                 pathThisShip,
                 `${type in typeFileName ? typeFileName[type] : type}.png`
@@ -307,32 +308,42 @@ module.exports = async (onProgress, proxy) => {
         }
 
         // 友方舰娘额外图片
-        if (!isEnemy) {
-            for (let type of imgTypesHoliday) {
-                const dir = path.resolve(dirPicsShipsExtra, `_${id}`)
-                const picId = type in typeFileName ? typeFileName[type] : type
-                const saveTo = path.resolve(dir, `${picId}.png`)
-                await fs.ensureDir(dir)
-                downloadList.push({
-                    id, name, ship,
-                    type,
-                    url: getPicUrlShip(id, type, picsVersionsNew[id], [map[id]]),
-                    pathname: saveTo,
-                    version: picsVersionsNew[id],
-                    ignore404: true,
-                    // onFail: async () => {
-                    //     await fs.remove(dir)
-                    // },
-                    onFetch: () => {
-                        // 该文件下载完成后，对比标准图片，如果相同，删除
-                        const md5Original = md5File.sync(path.resolve(dirPicsShips, `${id}`, `${picId}.png`))
-                        const md5This = md5File.sync(saveTo)
-                        if (md5Original === md5This)
-                            fs.removeSync(saveTo)
-                    }
-                })
-            }
-        }
+        // if (!isEnemy) {
+        //     for (let type of imgTypes) {
+        //         const dir = path.resolve(dirPicsShipsExtra, `_${id}`)
+        //         const picId = type in typeFileName ? typeFileName[type] : type
+
+        //         const dirOriginal = path.resolve(dirPicsShips, `${id}`)
+        //         const fileOriginal = path.resolve(dirOriginal, `${picId}.png`)
+        //         const fileExtra = path.resolve(dir, `${picId}.png`)
+
+        //         await fs.ensureDir(dir)
+
+        //         downloadList.push({
+        //             id, name, ship,
+        //             type,
+        //             url: getPicUrlShip(id, type, picsVersionsNew[id], [map[id]]),
+        //             pathname: fileExtra,
+        //             version: picsVersionsNew[id],
+        //             ignore404: true,
+        //             // onFail: async () => {
+        //             //     await fs.remove(dir)
+        //             // },
+        //             onFetch: () => {
+        //                 // 如果原始版本文件不存在，移动到原始版本目录
+        //                 if (!fs.existsSync(fileOriginal)) {
+        //                     fs.moveSync(fileExtra, fileOriginal)
+        //                     return
+        //                 }
+        //                 // 该文件下载完成后，对比标准图片，如果相同，删除
+        //                 const md5Original = md5File.sync(fileOriginal)
+        //                 const md5This = md5File.sync(fileExtra)
+        //                 if (md5Original === md5This)
+        //                     fs.removeSync(fileExtra)
+        //             }
+        //         })
+        //     }
+        // }
     }
 
     await batch(

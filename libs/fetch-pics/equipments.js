@@ -81,7 +81,7 @@ module.exports = async (onProgress, proxy) => {
         if (id >= enemyEquipmentIdStartFrom)
             return false
 
-        const version = parseInt(obj.api_version || 0)
+        const version = parseInt(obj.api_version || 1)
         if (version == picsVersions[id])
             return false
 
