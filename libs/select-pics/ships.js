@@ -34,7 +34,7 @@ module.exports = async () => new Promise(async (resolve, reject) => {
 
     // 检查新增
     {
-        const dir = path.resolve(pathname.fetched.pics.ships, `./extract`)
+        const dir = path.resolve(pathname.fetched.pics.ships, ``)
         const list = await fs.readdir(dir)
         const apiStart2 = await fs.readJSON(pathname.apiStart2)
 
@@ -101,7 +101,7 @@ module.exports = async () => new Promise(async (resolve, reject) => {
     for (const ship of ships) {
         // 目录资源
         const dir = {
-            extracted: path.resolve(pathname.fetched.pics.ships, `./extract/${ship.id}`),
+            extracted: path.resolve(pathname.fetched.pics.ships, `./${ship.id}`),
             ship: path.resolve(pathname.repoPics, `./dist/ships/${ship.id}`)
         }
 
@@ -208,7 +208,7 @@ module.exports = async () => new Promise(async (resolve, reject) => {
                         for (const picId of check) {
                             const file = path.resolve(
                                 pathname.fetched.pics.ships,
-                                `./extract/${thatShip.id}/${picId}.png`
+                                `./${thatShip.id}/${picId}.png`
                             )
                             const thatMD5 = await md5File(file)
                             didCheck = true

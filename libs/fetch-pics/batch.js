@@ -45,6 +45,7 @@ module.exports = async (
             ignore404 = false,
             onFetch = () => { },
             onFail = () => { },
+            on404 = () => { },
         } = o
 
         status[id] = true
@@ -57,7 +58,7 @@ module.exports = async (
         )
             .then(onFetch)
             .catch(async err => {
-                if (err == 404) return
+                if (err == 404) return await on404()
                 console.log(_url, err)
                 status[id] = false
                 await onFail(err)

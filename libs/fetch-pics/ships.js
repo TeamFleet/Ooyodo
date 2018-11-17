@@ -9,6 +9,8 @@ const {
 const batch = require('./batch')
 
 const getPicUrlShip = require('../commons/get-pic-url-ship')
+const fetchFile = require('../commons/fetch-file')
+const wait = require('../commons/wait')
 
 const dirPicsShips = pathname.fetched.pics.ships
 const dirPicsShipsExtra = pathname.fetched.pics.shipsExtra
@@ -304,6 +306,13 @@ module.exports = async (onProgress, proxy) => {
                 url,
                 pathname,
                 version: picsVersionsNew[id],
+                on404: async () => {
+                    await wait(1 * 1000)
+                    await fetchFile(
+                        getPicUrlShip(id, type, picsVersionsNew[id]),
+                        pathname,
+                    ).catch(() => { })
+                }
             })
         }
 

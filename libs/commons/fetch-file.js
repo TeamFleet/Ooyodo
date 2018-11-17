@@ -3,6 +3,12 @@ const request = require('request')
 
 const timeout = 2 * 60 * 1000
 
+/**
+ * 下载文件到目标位置
+ * @async
+ * @param {String} url
+ * @param {String} topath
+ */
 module.exports = async (url, topath, proxy) => {
     let statusCode
     // let lastTimeRecieved = Date.now()
@@ -10,7 +16,7 @@ module.exports = async (url, topath, proxy) => {
     const stream = () => new Promise((resolve, reject) => {
         let timeoutTimeout
         let isTimeout = false
-        // let readStream
+        let readStream
         // const setTimeoutTimeout = () => {
         //     try {
         //         clearTimeout(timeoutTimeout)
@@ -54,18 +60,30 @@ module.exports = async (url, topath, proxy) => {
                 //     setTimeoutTimeout()
                 // })
                 .pipe(
-                    fs.createWriteStream(topath)
+                    readStream = fs.createWriteStream(topath)
                         .on('finish', function () {
                             if (isTimeout) return
+                            clearTimeout(timeoutTimeout)
+
                             if (statusCode != 200) {
                                 fs.unlinkSync(topath)
-                                reject(statusCode)
+                                readStream.destroy()
+                                return reject(statusCode)
                             }
-                            clearTimeout(timeoutTimeout)
+
                             resolve()
                             // if (statusCode != 200 || data['api_name'] == 'なし') {
                             //     skipped = true
                             // }
+                        })
+                        .on('error', function (err) {
+                            if (err.code === 'EPERM') {
+                                readStream.destroy()
+                                return createRequest()
+                            }
+                            // console.log(err.errno, err.code)
+                            console.log('stream error', err)
+                            // reject(new Error(err))
                         })
                 )
 

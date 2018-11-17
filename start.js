@@ -15,10 +15,15 @@ const logWIP = str => console.log('\x1b[31m' + '× \x1b[91m[WIP] \x1b[0m' + str)
 const run = async () => {
 
     let isOnlyDownload = false
+    let isDist = false
     const argvs = Array.isArray(argv._)
         ? argv._.filter(arg => {
             if (arg === 'only-download') {
                 isOnlyDownload = true
+                return false
+            }
+            if (arg === 'dist') {
+                isDist = true
                 return false
             }
             return true
@@ -30,28 +35,34 @@ const run = async () => {
     console.log(chalk.cyanBright('Ooyodo'))
     console.log('')
 
-    const token = await require('./steps/get-token')(argvs)
-
-    if (!isOnlyDownload) {
-        await require('./steps/ensure-directories')()
-        await require('./steps/fetch-api-start2')(token)
-        await require('./steps/prepare-repositories')()
-    }
-
-    await require('./steps/download-pics-ships')()
-    await require('./steps/download-pics-equipments')()
-
-    if (!isOnlyDownload) {
-        await require('./steps/initialize-database')()
-
-        if (isKC2Transition) {
-            await require('./steps/kc2-transition')()
-        } else {
-            const newpics = []
+    await (async () => {
+        if (isDist) {
+            await require('./steps/dist')()
+            return
         }
 
-        await require('./steps/dist')()
-    }
+        const token = await require('./steps/get-token')(argvs)
+
+        if (!isOnlyDownload) {
+            await require('./steps/ensure-directories')()
+            await require('./steps/fetch-api-start2')(token)
+            await require('./steps/prepare-repositories')()
+        }
+
+        const versionsShipsOld = await require('./steps/get-versions-ships')()
+        await require('./steps/download-pics-ships')()
+        await require('./steps/download-pics-equipments')()
+        await require('./steps/initialize-database')()
+        await require('./steps/select-pics-ships')(versionsShipsOld)
+
+        if (!isOnlyDownload) {
+            if (isKC2Transition) {
+                await require('./steps/kc2-transition')()
+            }
+        }
+
+        return
+    })()
 
     console.log('')
     console.log(chalk.greenBright('完成'))
@@ -59,46 +70,6 @@ const run = async () => {
     console.log(''.padEnd(strPaddingLength, strPaddingStr))
 
     return
-
-    /************************************************
-     * 查找新的舰娘图片
-     ***********************************************/
-    {
-        const step = '查找新的舰娘图片'
-        const waiting = spinner(step)
-        const run = require('./libs/select-pics/ships')
-        await run()
-            .then(newlist => {
-                if (Array.isArray(newlist) && newlist.length) {
-                    waiting.finish()
-                    newpics = newpics.concat(newlist)
-                    console.log(
-                        newlist.map(obj => {
-                            let msg = '  \x1b[92m' + '✦ NEW!✦ ' + '\x1b[0m'
-                                + (obj.id + '').padStart(3, ' ')
-                                + ' - '
-
-                            if (typeof obj.ship === 'object') {
-                                if (obj.ship.id == obj.id) {
-                                    msg += obj.ship._name
-                                } else {
-                                    msg += `[${obj.ship.id}] ${obj.ship._name}`
-                                }
-                            } else if (obj.ship === true) {
-                                msg += '新舰娘'
-                            } else if (typeof obj.ship === 'string') {
-                                msg += obj.ship
-                            }
-
-                            return msg
-                        }).join('\n')
-                    )
-                } else {
-                    waiting.finish(step + ': 无新图')
-                }
-            })
-            .catch(err => waiting.error(step, err))
-    }
 
     /************************************************
      * 查找新的装备图片
