@@ -1,3 +1,4 @@
+const fs = require('fs-extra')
 const path = require('path')
 const copyFiles = require('../../libs/commons/copy-files')
 
@@ -32,21 +33,27 @@ const getFolder = (type, category, id, group) => {
 
 module.exports = async (title, list = []) => {
 
-    await copyFiles(
-        list.map(o => {
-            const {
-                category,
-                type,
-                id,
-                filename,
-                group,
-            } = o
-            const from = path.resolve(repoPics, 'dist', category, '' + id, '' + filename)
-            const to = getFolder(type, category, id, group)
-            const dest = path.resolve(to, filename)
-            return [from, dest]
-        })
-        , title
-    )
+    const pairs = []
+
+    list.forEach(o => {
+        const {
+            category,
+            type,
+            id,
+            filename,
+            group,
+        } = o
+        const from = path.resolve(repoPics, 'dist', category, '' + id, '' + filename)
+
+        if (!fs.existsSync(from))
+            return
+
+        const to = getFolder(type, category, id, group)
+        const dest = path.resolve(to, filename)
+
+        pairs.push([from, dest])
+    })
+
+    await copyFiles(pairs, title)
 
 }

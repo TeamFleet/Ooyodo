@@ -64,3 +64,4 @@ typings/
 /.new_pics
 /.kc2
 /.dist-*
+/.dist/
