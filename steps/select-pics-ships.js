@@ -26,7 +26,7 @@ module.exports = async (versionsOld = {}) => {
 
     const checkId = (id) => id < enemyIdStartFrom
 
-    /* TEMP */ versionsOld = {}
+    // /* TEMP */ versionsOld = {}
     const versionsNew = await fs.readJson(filePicsVersions)
 
     const fetchedIds = await readDirIds(dirFetchedShips, checkId)
