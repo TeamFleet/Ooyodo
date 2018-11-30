@@ -4,12 +4,12 @@
  * @param {Object} argv
  * @returns {String}
  */
-module.exports = async (argv = {}) => {
-    if (argv.token)
-        return argv.token
+module.exports = async (args = {}) => {
+    if (args.token)
+        return args.token
 
-    if (Array.isArray(argv._) && argv._.length) {
-        let token = argv._[0] + ''
+    if (Array.isArray(args) && args.length) {
+        let token = args[0] + ''
         if (token.substr(0, 6) == 'token=' ||
             token.substr(0, 6) == 'token:')
             token = token.substr(6)

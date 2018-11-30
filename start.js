@@ -42,22 +42,25 @@ const run = async () => {
         }
 
         const token = await require('./steps/get-token')(argvs)
+        await require('./steps/ensure-directories')()
+        await require('./steps/fetch-api-start2')(token)
 
         if (!isOnlyDownload) {
-            await require('./steps/ensure-directories')()
-            await require('./steps/fetch-api-start2')(token)
             await require('./steps/prepare-repositories')()
         }
 
         const versionsShipsOld = await require('./steps/get-versions-ships')()
         await require('./steps/download-pics-ships')()
         await require('./steps/download-pics-equipments')()
-        await require('./steps/initialize-database')()
-        await require('./steps/select-pics-ships')(versionsShipsOld)
 
-        if (!isOnlyDownload) {
-            if (isKC2Transition) {
-                await require('./steps/kc2-transition')()
+        if (!token) {
+            await require('./steps/initialize-database')()
+            await require('./steps/select-pics-ships')(versionsShipsOld)
+
+            if (!isOnlyDownload) {
+                if (isKC2Transition) {
+                    await require('./steps/kc2-transition')()
+                }
             }
         }
 
