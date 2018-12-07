@@ -104,13 +104,17 @@ module.exports = async (versionsOld = {}) => {
     // 对比新下载的文件和该舰娘所有已知图鉴
     {
         const updated = Object.keys(versionsNew)
-            .filter(id => (
-                !(id in versionsOld) ||
-                versionsOld[id] != versionsNew[id]
-            ))
+            // .filter(id => (
+            //     !(id in versionsOld) ||
+            //     versionsOld[id] != versionsNew[id]
+            // ))
+            .filter(id => !!db.ships[id])
+            .filter(id => {
+                const versionOld = db.ships[id].illust_version || -1
+                return versionOld != versionsNew[id]
+            })
             .map(id => parseInt(id))
             .filter(checkId)
-            .filter(id => !!db.ships[id])
             .sort((a, b) => a - b)
 
         for (let id of updated) {
