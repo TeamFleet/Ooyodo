@@ -32,7 +32,7 @@ module.exports = async (options = {}) => {
         const apiPath = `${ip}kcsapi/api_start2/getData` // KC2
 
         // const referer = `http://${ip}/kcs/mainD2.swf?api_token=${api_token}&api_starttime=${(new Date()).valueOf()}/[[DYNAMIC]]/1`, // KC1
-        const referer = `${ip}kcs2/index.php?api_root=/kcsapi&voice_root=/kcs/sound&osapi_root=osapi.dmm.com&version=4.0.0.2&api_token=${api_token}&api_starttime=${Date.now()}` // KC2
+        const referer = `${ip}kcs2/index.php?api_root=/kcsapi&voice_root=/kcs/sound&osapi_root=osapi.dmm.com&version=4.3.1.0&api_token=${api_token}&api_starttime=${Date.now()}` // KC2
 
         request({
             uri: url.parse(apiPath),
@@ -42,8 +42,7 @@ module.exports = async (options = {}) => {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Pragma': 'no-cache',
                 'Referer': referer,
-                'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36',
-                'X-Requested-With': 'ShockwaveFlash/17.0.0.169'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
             },
             formData: {
                 api_token,
