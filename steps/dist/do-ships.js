@@ -22,10 +22,11 @@ module.exports = async () => {
             '0.png', '0.webp',
             '0-1.png', '0-1.webp', '0-2.png', '0-2.webp',
             '8.png', '8.webp', '9.png', '9.webp', '10.png', '10.webp',
+            'special.png', 'special.webp'
         ]
     }
     const sameAsPrevPicIdsIgnore = [
-        8, 9, 10, 11
+        8, 9, 10, 11, 'special'
     ]
 
     const db = await createDatastore()
