@@ -6,6 +6,7 @@ const { enemyIdStartFrom, db, pathname } = require('../libs/vars')
 const spinner = require('../libs/commons/spinner')
 const readDirIds = require('../libs/commons/read-dir-ids')
 const copyFiles = require('../libs/commons/copy-files')
+const removeSubfolders = require('../libs/commons/remove-subfolders')
 // const run = require('../libs/select-pics/ships')
 
 const filePicsVersions = pathname.fetched.versions.ships
@@ -20,6 +21,9 @@ const filesDefault = ['8.png', '9.png']
 module.exports = async (versionsOld = {}) => {
     const step = '查找新的舰娘图片'
     const waiting = spinner(step)
+
+    // 清理目标目录
+    await removeSubfolders(pathname.newPics)
 
     /** @type {Array} 新内容列表 */
     const newlist = []
