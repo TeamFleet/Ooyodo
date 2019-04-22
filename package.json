@@ -19,21 +19,21 @@
         "test": "jest"
     },
     "dependencies": {
-        "kckit": "^1.21.23",
+        "kckit": "^1.21.27",
         "fs-extra": "^7.0.1",
         "request": "^2.88.0",
         "nedb-promise": "^2.0.1",
         "jpexs-flash-decompiler": "Diablohu/jpexs-flash-decompiler",
-        "ora": "^3.2.0",
+        "ora": "^3.4.0",
         "progress": "^2.0.3",
         "yargs": "^13.2.2",
-        "simple-git": "^1.107.0",
+        "simple-git": "^1.110.0",
         "md5-file": "^4.0.0",
         "ncp": "^2.0.0"
     },
     "devDependencies": {
-        "eslint": "^5.15.3",
+        "eslint": "^5.16.0",
         "babel-eslint": "^10.0.1",
-        "jest": "^24.5.0"
+        "jest": "^24.7.1"
     }
 }

@@ -6,7 +6,8 @@ const fetchApiStar2 = require('../libs/fetch-gameapi/start2')
 const {
     pathname,
     strPaddingLength,
-    strPaddingStr
+    strPaddingStr,
+    proxy: _proxy
 } = require('../libs/vars')
 
 /**
@@ -25,7 +26,8 @@ module.exports = async (token = '') => {
         const waiting = spinner(step)
 
         data = await fetchApiStar2({
-            token
+            token,
+            proxy: _proxy
         }).catch(err => {
             let msg = ''
             if (err && err.message) {

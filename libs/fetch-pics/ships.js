@@ -5,6 +5,7 @@ const md5File = require('md5-file')
 const {
     enemyIdStartFrom,
     pathname,
+    proxy: _proxy
 } = require('../vars')
 const batch = require('./batch')
 
@@ -78,7 +79,7 @@ fetched_data
  * @param {number} obj.index - 当前完成的index
  * @param {number} obj.length - 有效总数
  */
-module.exports = async (onProgress, proxy) => {
+module.exports = async (onProgress, proxy = _proxy) => {
 
     await fs.ensureDir(dirPicsShips)
     await fs.ensureDir(dirPicsShipsExtra)

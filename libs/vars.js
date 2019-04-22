@@ -37,5 +37,8 @@ module.exports = {
     },
 
     strPaddingLength: 50,
-    strPaddingStr: '─'
+    strPaddingStr: '─',
+
+    // proxy: 'http://127.0.0.1:8118'
+    proxy: undefined
 }
