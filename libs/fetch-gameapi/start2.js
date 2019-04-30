@@ -32,7 +32,7 @@ module.exports = async (options = {}) => {
         const apiPath = `${ip}kcsapi/api_start2/getData` // KC2
 
         // const referer = `http://${ip}/kcs/mainD2.swf?api_token=${api_token}&api_starttime=${(new Date()).valueOf()}/[[DYNAMIC]]/1`, // KC1
-        const referer = `${ip}kcs2/index.php?api_root=/kcsapi&voice_root=/kcs/sound&osapi_root=osapi.dmm.com&version=4.3.1.0&api_token=${api_token}&api_starttime=${Date.now()}` // KC2
+        const referer = `${ip}kcs2/index.php?api_root=/kcsapi&voice_root=/kcs/sound&osapi_root=osapi.dmm.com&version=4.3.6.5&api_token=${api_token}&api_starttime=${Date.now()}` // KC2
 
         request({
             uri: url.parse(apiPath),
