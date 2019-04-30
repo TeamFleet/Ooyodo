@@ -38,11 +38,13 @@ module.exports = async (options = {}) => {
             uri: url.parse(apiPath),
             method: 'POST',
             headers: {
-                'Cache-Control': 'no-cache',
+                // 'Cache-Control': 'no-cache',
+                'Accept': 'application/json, text/plain, */*',
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'Pragma': 'no-cache',
+                'Origin': ip,
+                // 'Pragma': 'no-cache',
                 'Referer': referer,
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.36',
             },
             formData: {
                 api_token,
