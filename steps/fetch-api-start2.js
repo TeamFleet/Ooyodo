@@ -39,6 +39,7 @@ module.exports = async (token = '') => {
                     msg = err.api_result_msg
             }
             waiting.fail(step + '\n  ' + msg)
+            throw new Error(err)
         })
 
         if (typeof data === 'object') {
