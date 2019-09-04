@@ -3,7 +3,7 @@ const url = require('url')
 const request = require('request')
 // const fs = require('fs-extra')
 
-const { World_17 } = require('../servers')
+const { World_17: gameServerIP } = require('../servers')
 
 /**
  * 获取游戏API: api_start2
@@ -17,7 +17,7 @@ const { World_17 } = require('../servers')
  */
 module.exports = async (options = {}) => {
     const {
-        ip = World_17,
+        ip = gameServerIP,
         proxy,
     } = options
     const api_token = options.api_token || options.token
@@ -30,7 +30,7 @@ module.exports = async (options = {}) => {
     return await new Promise((resolve, reject) => {
         // const apiPath = `http://${ip}/kcsapi/api_start2` // KC1
         const apiPath = `${ip}kcsapi/api_start2/getData` // KC2
-        const gameVersion = '4.4.4.0'
+        const gameVersion = '4.4.5.0'
         // const referer = `http://${ip}/kcs/mainD2.swf?api_token=${api_token}&api_starttime=${(new Date()).valueOf()}/[[DYNAMIC]]/1`, // KC1
         const referer = `${ip}kcs2/index.php?api_root=/kcsapi&voice_root=/kcs/sound&osapi_root=osapi.dmm.com&version=${gameVersion}&api_token=${api_token}&api_starttime=${Date.now()}` // KC2
 

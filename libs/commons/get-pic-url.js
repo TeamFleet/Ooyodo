@@ -1,4 +1,4 @@
-const { World_17: apiOrigin } = require('../servers')
+const { World_1: apiOrigin } = require('../servers')
 const suffixUtils = require('./suffix-utils')
 
 /**
