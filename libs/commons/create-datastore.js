@@ -1,14 +1,14 @@
-const path = require('path')
-const Datastore = require('nedb')
-const nedbPromise = require('nedb-promise')
+const path = require('path');
+// const Datastore = require('nedb')
+const nedbPromise = require('nedb-promise');
 
-const { pathname } = require('../vars')
+const { pathname } = require('../vars');
 
 const initNedb = (dbnames = []) => {
-    const db = {}
-    for (let o of dbnames) {
-        const dbname = Array.isArray(o) ? o[0] : o
-        const filename = Array.isArray(o) ? o[1] : o
+    const db = {};
+    for (const o of dbnames) {
+        const dbname = Array.isArray(o) ? o[0] : o;
+        const filename = Array.isArray(o) ? o[1] : o;
         // const store = Datastore({
         //     filename: path.resolve(pathname.repoDatabase, 'db', `${filename}.nedb`),
         //     autoload: true,
@@ -17,12 +17,16 @@ const initNedb = (dbnames = []) => {
         // db.persistence = store.persistence
         // db[dbname] = db
         db[dbname] = nedbPromise({
-            filename: path.resolve(pathname.repoDatabase, 'db', `${filename}.nedb`),
-            autoload: true,
-        })
+            filename: path.resolve(
+                pathname.repoDatabase,
+                'db',
+                `${filename}.nedb`
+            ),
+            autoload: true
+        });
     }
-    return db
-}
+    return db;
+};
 
 /**
  * 创建数据存储空间（NeDB）
@@ -45,5 +49,5 @@ module.exports = async () => {
 
         'exillusts',
         ['exillustTypes', 'exillust_types']
-    ])
-}
+    ]);
+};

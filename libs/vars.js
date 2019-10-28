@@ -1,9 +1,10 @@
-const path = require('path')
-const spinners = require('cli-spinners')
+const fs = require('fs-extra');
+const path = require('path');
+const spinners = require('cli-spinners');
 const {
-    enemyIdStartFrom,
+    enemyIdStartFrom
     // enemyEquipmentIdStartFrom
-} = require('kckit')
+} = require('kckit');
 
 module.exports = {
     db: {},
@@ -17,23 +18,52 @@ module.exports = {
         fetchedData: path.resolve(process.cwd(), './.fetched_data'),
         fetched: {
             pics: {
-                ships: path.resolve(process.cwd(), './.fetched_data/pics/ships'),
-                shipsExtra: path.resolve(process.cwd(), './.fetched_data/pics/ships-extra'),
-                enemies: path.resolve(process.cwd(), './.fetched_data/pics/enemies'),
-                equipments: path.resolve(process.cwd(), './.fetched_data/pics/equipments'),
+                ships: path.resolve(
+                    process.cwd(),
+                    './.fetched_data/pics/ships'
+                ),
+                shipsExtra: path.resolve(
+                    process.cwd(),
+                    './.fetched_data/pics/ships-extra'
+                ),
+                enemies: path.resolve(
+                    process.cwd(),
+                    './.fetched_data/pics/enemies'
+                ),
+                equipments: path.resolve(
+                    process.cwd(),
+                    './.fetched_data/pics/equipments'
+                )
             },
             versions: {
-                ships: path.resolve(process.cwd(), './.fetched_data/pics/ships_versions.json'),
-                equipments: path.resolve(process.cwd(), './.fetched_data/pics/equipments_versions.json'),
+                ships: path.resolve(
+                    process.cwd(),
+                    './.fetched_data/pics/ships_versions.json'
+                ),
+                equipments: path.resolve(
+                    process.cwd(),
+                    './.fetched_data/pics/equipments_versions.json'
+                )
             }
         },
 
         repoPics: path.resolve(process.cwd(), './.repo_pics'),
-        repoDatabase: path.resolve(process.cwd(), './.repo_database'),
+        repoDatabase: (() => {
+            const pathFromParentFolder = path.resolve(
+                __dirname,
+                '../../database'
+            );
+            if (fs.existsSync(pathFromParentFolder))
+                return pathFromParentFolder;
+            path.resolve(process.cwd(), './.repo_database');
+        })(),
 
         newPics: path.resolve(process.cwd(), './.new_pics'),
 
-        apiStart2: path.resolve(process.cwd(), './.fetched_data/api_start2.json')
+        apiStart2: path.resolve(
+            process.cwd(),
+            './.fetched_data/api_start2.json'
+        )
     },
 
     strPaddingLength: 50,
@@ -41,4 +71,4 @@ module.exports = {
 
     // proxy: 'http://127.0.0.1:8118'
     proxy: undefined
-}
+};
