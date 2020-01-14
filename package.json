@@ -21,7 +21,7 @@
     },
     "dependencies": {
         "fs-extra": "^8.1.0",
-        "kckit": "^1.29.0",
+        "kckit": "^1.30.0",
         "md5-file": "^4.0.0",
         "ncp": "^2.0.0",
         "nedb-promise": "^2.0.1",
@@ -35,7 +35,7 @@
         "babel-eslint": "^10.0.1",
         "eslint": "^6.8.0",
         "eslint-config-koot": "^1.6.0",
-        "husky": "^3.1.0",
+        "husky": "^4.0.6",
         "jest": "^24.7.1",
         "lint-staged": "^9.5.0",
         "prettier": "^1.19.1",
