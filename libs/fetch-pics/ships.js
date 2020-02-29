@@ -1,23 +1,19 @@
-const path = require('path')
-const fs = require('fs-extra')
-const md5File = require('md5-file')
+const path = require('path');
+const fs = require('fs-extra');
+const md5File = require('md5-file');
 
-const {
-    enemyIdStartFrom,
-    pathname,
-    proxy: _proxy
-} = require('../vars')
-const batch = require('./batch')
+const { enemyIdStartFrom, pathname, proxy: _proxy } = require('../vars');
+const batch = require('./batch');
 
-const getPicUrlShip = require('../commons/get-pic-url-ship')
-const fetchFile = require('../commons/fetch-file')
-const wait = require('../commons/wait')
+const getPicUrlShip = require('../commons/get-pic-url-ship');
+const fetchFile = require('../commons/fetch-file');
+const wait = require('../commons/wait');
 
-const dirPicsShips = pathname.fetched.pics.ships
-const dirPicsShipsExtra = pathname.fetched.pics.shipsExtra
-const dirPicsEnemies = pathname.fetched.pics.enemies
-const fileApiStart2 = pathname.apiStart2
-const filePicsVersions = pathname.fetched.versions.ships
+const dirPicsShips = pathname.fetched.pics.ships;
+const dirPicsShipsExtra = pathname.fetched.pics.shipsExtra;
+const dirPicsEnemies = pathname.fetched.pics.enemies;
+const fileApiStart2 = pathname.apiStart2;
+const filePicsVersions = pathname.fetched.versions.ships;
 
 const imgTypes = [
     'full',
@@ -30,8 +26,8 @@ const imgTypes = [
     'banner_dmg',
     'card',
     'card_dmg',
-    'special',
-]
+    'special'
+];
 // const imgTypesHoliday = [
 //     'full',
 //     'full_dmg'
@@ -39,9 +35,9 @@ const imgTypes = [
 const imgTypesEnemy = [
     'full',
     // 'full_dmg',
-    'banner',
+    'banner'
     // 'banner_dmg',
-]
+];
 const typeFileName = {
     banner: 0,
     banner_dmg: 1,
@@ -50,8 +46,8 @@ const typeFileName = {
     full: 8,
     full_dmg: 9,
     remodel: 10,
-    remodel_dmg: 11,
-}
+    remodel_dmg: 11
+};
 
 // http://203.104.209.23/kcs2/resources/ship/full/0406_6059.png?version=2
 
@@ -66,7 +62,7 @@ fetched_data
 
 /**
  * 获取舰娘图片资源
- * 
+ *
  * @param {onProgressCallback} onProgress - 每下载一个舰娘的图片后会执行的回调函数
  * @param {Object} proxy - 代理服务器设置
  * @return {promise}
@@ -80,38 +76,35 @@ fetched_data
  * @param {number} obj.length - 有效总数
  */
 module.exports = async (onProgress, proxy = _proxy) => {
+    await fs.ensureDir(dirPicsShips);
+    await fs.ensureDir(dirPicsShipsExtra);
+    await fs.ensureDir(dirPicsEnemies);
 
-    await fs.ensureDir(dirPicsShips)
-    await fs.ensureDir(dirPicsShipsExtra)
-    await fs.ensureDir(dirPicsEnemies)
-
-    if (!fs.existsSync(fileApiStart2))
-        throw new Error('api_start2 不存在')
+    if (!fs.existsSync(fileApiStart2)) throw new Error('api_start2 不存在');
 
     if (!fs.existsSync(filePicsVersions))
-        await fs.writeJson(filePicsVersions, {})
+        await fs.writeJson(filePicsVersions, {});
 
-    const ships = {} // 舰娘元数据
-    const map = {} // 舰娘和加密ID的对应
-    const picsVersions = await fs.readJSON(filePicsVersions) // 已存在的舰娘图片版本
-    const needUpdate = [] // 需要更新的舰娘
-    const picsVersionsNew = {} // 更新后的舰娘图片版本
-    const downloadList = [] // 下载URL列表
-    const apiStart2 = await fs.readJSON(fileApiStart2)
+    const ships = {}; // 舰娘元数据
+    const map = {}; // 舰娘和加密ID的对应
+    const picsVersions = await fs.readJSON(filePicsVersions); // 已存在的舰娘图片版本
+    const needUpdate = []; // 需要更新的舰娘
+    const picsVersionsNew = {}; // 更新后的舰娘图片版本
+    const downloadList = []; // 下载URL列表
+    const apiStart2 = await fs.readJSON(fileApiStart2);
 
-    if (typeof apiStart2 !== 'object' ||
+    if (
+        typeof apiStart2 !== 'object' ||
         typeof apiStart2.api_data !== 'object' ||
         typeof apiStart2.api_data.api_mst_ship !== 'object' ||
-        typeof apiStart2.api_data.api_mst_shipgraph !== 'object') {
-        throw new Error('api_start2.json 已损坏，请提供 token 以重新下载')
+        typeof apiStart2.api_data.api_mst_shipgraph !== 'object'
+    ) {
+        throw new Error('api_start2.json 已损坏，请提供 token 以重新下载');
     }
 
     const {
-        api_data: {
-            api_mst_ship: rawShips,
-            api_mst_shipgraph: shipgraph,
-        }
-    } = apiStart2
+        api_data: { api_mst_ship: rawShips, api_mst_shipgraph: shipgraph }
+    } = apiStart2;
 
     /* data examples
 
@@ -253,68 +246,75 @@ module.exports = async (onProgress, proxy = _proxy) => {
      */
 
     // 确定舰娘图片的加密ID对应
-    for (let i in rawShips) {
+    for (const i in rawShips) {
         if (rawShips[i].api_name !== 'なし') {
-            ships[rawShips[i].api_id] = rawShips[i]
-            map[rawShips[i].api_id] = null
+            ships[rawShips[i].api_id] = rawShips[i];
+            map[rawShips[i].api_id] = null;
             // shipsCount++
         }
     }
 
     // 确定当前图片版本
-    for (let i in shipgraph) {
-        const o = shipgraph[i]
-        const id = o.api_id
+    for (const i in shipgraph) {
+        const o = shipgraph[i];
+        const id = o.api_id;
         // console.log(id, o.api_filename)
         if (typeof map[id] !== 'undefined') {
-            map[id] = o.api_filename
+            map[id] = o.api_filename;
 
-            let curPicVersion
+            let curPicVersion;
             if (Array.isArray(o.api_version)) {
                 // curPicVersion = o.api_version
                 //     .map(value => parseInt(value))
                 //     .reduce((accumulator, currentValue) => accumulator + currentValue)
-                curPicVersion = parseInt(o.api_version[0])
-            } else
-                curPicVersion = parseInt(o.api_version)
+                curPicVersion = parseInt(o.api_version[0]);
+            } else curPicVersion = parseInt(o.api_version);
 
-            if (curPicVersion !== picsVersions[id])
-                needUpdate.push(id)
+            if (curPicVersion !== picsVersions[id]) needUpdate.push(id);
 
             // 更新图片版本
-            picsVersionsNew[id] = curPicVersion
+            picsVersionsNew[id] = curPicVersion;
         }
     }
 
-    for (let id of needUpdate) {
-        const isEnemy = (id >= enemyIdStartFrom)
-        const ship = ships[id]
-        const name = ship.api_name + (isEnemy && ship.api_yomi !== '-' ? (ship.api_yomi || '') : '')
-        const types = isEnemy ? imgTypesEnemy : imgTypes
-        const pathThisShip = path.join(isEnemy ? dirPicsEnemies : dirPicsShips, `${id}`)
+    for (const id of needUpdate) {
+        const isEnemy = id >= enemyIdStartFrom;
+        const ship = ships[id];
+        const name =
+            ship.api_name +
+            (isEnemy && ship.api_yomi !== '-' ? ship.api_yomi || '' : '');
+        const types = isEnemy ? imgTypesEnemy : imgTypes;
+        const pathThisShip = path.join(
+            isEnemy ? dirPicsEnemies : dirPicsShips,
+            `${id}`
+        );
 
-        await fs.ensureDir(pathThisShip)
+        await fs.ensureDir(pathThisShip);
 
-        for (let type of types) {
-            const url = getPicUrlShip(id, type, picsVersionsNew[id], [map[id]])
+        for (const type of types) {
+            const url = getPicUrlShip(id, type, picsVersionsNew[id], [map[id]]);
             const pathname = path.join(
                 pathThisShip,
                 `${type in typeFileName ? typeFileName[type] : type}.png`
-            )
+            );
+            const retryForNoTrail = async () => {
+                await wait(1 * 1000);
+                await fetchFile(
+                    getPicUrlShip(id, type, picsVersionsNew[id]),
+                    pathname
+                ).catch(() => {});
+            };
             downloadList.push({
-                id, name, ship,
+                id,
+                name,
+                ship,
                 type,
                 url,
                 pathname,
                 version: picsVersionsNew[id],
-                on404: async () => {
-                    await wait(1 * 1000)
-                    await fetchFile(
-                        getPicUrlShip(id, type, picsVersionsNew[id]),
-                        pathname,
-                    ).catch(() => { })
-                }
-            })
+                on403: retryForNoTrail,
+                on404: retryForNoTrail
+            });
         }
 
         // 友方舰娘额外图片
@@ -356,22 +356,17 @@ module.exports = async (onProgress, proxy = _proxy) => {
         // }
     }
 
-    await batch(
-        downloadList,
-        onProgress,
-        filePicsVersions,
-        proxy,
-    )
+    await batch(downloadList, onProgress, filePicsVersions, proxy);
 
     // 检查 extra 目录下的每个文件夹，如果发现有空目录，清除
     {
         const dirs = (await fs.readdir(dirPicsShipsExtra))
             .map(filename => path.resolve(dirPicsShipsExtra, filename))
             .filter(pathname => fs.lstatSync(pathname).isDirectory())
-            .filter(pathname => !fs.readdirSync(pathname).length)
-        for (let dir of dirs) {
+            .filter(pathname => !fs.readdirSync(pathname).length);
+        for (const dir of dirs) {
             // console.log(dir)
-            await fs.remove(dir)
+            await fs.remove(dir);
         }
     }
-}
+};
