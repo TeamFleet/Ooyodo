@@ -30,7 +30,7 @@ module.exports = async (
             v[id] = versions[id];
         }
         // console.log('updateVersionFile', id, status[id], versions[id], v)
-        await fs.writeJson(pathnamePicVersions, v);
+        await fs.writeJson(pathnamePicVersions, v, { spaces: 4 });
     };
 
     for (const curr of downloadList) {
@@ -68,7 +68,7 @@ module.exports = async (
         if (!status[id]) {
             const versions = await fs.readJson(pathnamePicVersions);
             versions[id] = -1;
-            await fs.writeJson(pathnamePicVersions, versions);
+            await fs.writeJson(pathnamePicVersions, versions, { spaces: 4 });
         }
 
         // 当前项和上一项 ID 不同时

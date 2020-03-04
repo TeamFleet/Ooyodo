@@ -83,7 +83,7 @@ module.exports = async (onProgress, proxy = _proxy) => {
     if (!fs.existsSync(fileApiStart2)) throw new Error('api_start2 不存在');
 
     if (!fs.existsSync(filePicsVersions))
-        await fs.writeJson(filePicsVersions, {});
+        await fs.writeJson(filePicsVersions, {}, { spaces: 4 });
 
     const ships = {}; // 舰娘元数据
     const map = {}; // 舰娘和加密ID的对应
