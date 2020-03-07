@@ -12,6 +12,7 @@ const isKC2Transition = true;
 const run = async () => {
     let isOnlyDownload = false;
     let isDist = false;
+    let isDistHash = false;
     const argvs = Array.isArray(argv._)
         ? argv._.filter(arg => {
               if (arg === 'only-download') {
@@ -20,6 +21,10 @@ const run = async () => {
               }
               if (arg === 'dist') {
                   isDist = true;
+                  return false;
+              }
+              if (arg === 'dist-hash') {
+                  isDistHash = true;
                   return false;
               }
               return true;
@@ -34,6 +39,11 @@ const run = async () => {
     await (async () => {
         if (isDist) {
             await require('./steps/dist')();
+            return;
+        }
+
+        if (isDistHash) {
+            await require('./steps/dist-hash')();
             return;
         }
 

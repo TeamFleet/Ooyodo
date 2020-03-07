@@ -5,6 +5,8 @@ const request = require('request');
 
 const { World_17: gameServerOrigin } = require('../servers');
 
+const { gameVersion } = require('../vars');
+
 /**
  * 获取游戏API: api_start2
  *
@@ -27,7 +29,6 @@ module.exports = async (options = {}) => {
     return await new Promise((resolve, reject) => {
         // const apiPath = `http://${origin}/kcsapi/api_start2` // KC1
         const apiPath = `${origin}kcsapi/api_start2/getData`; // KC2
-        const gameVersion = '4.5.4.1';
         // const referer = `http://${origin}/kcs/mainD2.swf?api_token=${api_token}&api_starttime=${(new Date()).valueOf()}/[[DYNAMIC]]/1`, // KC1
         const referer = `${origin}kcs2/index.php?api_root=/kcsapi&voice_root=/kcs/sound&osapi_root=osapi.dmm.com&version=${gameVersion}&api_token=${api_token}&api_starttime=${Date.now()}`; // KC2
 

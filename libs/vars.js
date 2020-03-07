@@ -7,6 +7,11 @@ const {
 } = require('kckit');
 
 module.exports = {
+    proxy: 'http://127.0.0.1:7890',
+    // proxy: undefined,
+
+    gameVersion: '4.5.4.1',
+
     db: {},
 
     spinner: spinners.dots,
@@ -67,8 +72,5 @@ module.exports = {
     },
 
     strPaddingLength: 50,
-    strPaddingStr: '─',
-
-    proxy: 'http://127.0.0.1:8118'
-    // proxy: undefined
+    strPaddingStr: '─'
 };
