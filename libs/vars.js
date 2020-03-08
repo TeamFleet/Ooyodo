@@ -62,6 +62,15 @@ module.exports = {
                 return pathFromParentFolder;
             path.resolve(process.cwd(), './.repo_database');
         })(),
+        repoAkigumo: (() => {
+            const pathFromParentFolder = path.resolve(
+                __dirname,
+                '../../Akigumo'
+            );
+            if (fs.existsSync(pathFromParentFolder))
+                return pathFromParentFolder;
+            path.resolve(process.cwd(), './.repo_akigumo');
+        })(),
 
         newPics: path.resolve(process.cwd(), './.new_pics'),
 

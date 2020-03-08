@@ -59,8 +59,7 @@ typings/
 
 # 项目内容
 /.fetched_data
-/.repo_database
-/.repo_pics
+/.repo_*/
 /.new_pics
 /.kc2
 /.dist-*

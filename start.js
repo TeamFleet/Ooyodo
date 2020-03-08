@@ -42,17 +42,18 @@ const run = async () => {
             return;
         }
 
-        if (isDistHash) {
-            await require('./steps/dist-hash')();
-            return;
-        }
-
         const token = await require('./steps/get-token')(argvs);
         await require('./steps/ensure-directories')();
         await require('./steps/fetch-api-start2')(token);
 
         if (!isOnlyDownload) {
             await require('./steps/prepare-repositories')();
+        }
+
+        if (isDistHash) {
+            console.log(' ');
+            await require('./steps/dist-hash')();
+            return;
         }
 
         const versionsShipsOld = await require('./steps/get-versions-ships')();

@@ -1,42 +1,120 @@
 const fs = require('fs-extra');
 const path = require('path');
-const chalk = require('chalk');
 const decamelize = require('decamelize');
 const md5File = require('md5-file/promise');
 const glob = require('glob-promise');
 
 const createDatastore = require('../libs/commons/create-datastore');
 const spinner = require('../libs/commons/spinner');
+const prepareRepo = require('../libs/commons/prepare-repo-dir');
+const logTitle = require('../libs/commons/log-title');
+const compactNedb = require('../libs/commons/compact-nedb');
 const {
-    pathname: { repoPics }
+    pathname: { repoPics, repoDatabase, repoAkigumo }
 } = require('../libs/vars');
 const Clpr = require('../libs/clpr');
 
-const dest = path.resolve(__dirname, '../.dist/hash');
+const dirAkigumo = repoAkigumo;
+let destPics;
+const destMaps = path.resolve(repoDatabase, 'db');
 let db;
 let filesCount = 0;
 
 // ============================================================================
 
 const main = async () => {
-    console.log(chalk.magentaBright.underline(`复制图片 (Hash 文件名)`) + '\n');
+    logTitle(`复制图片 (Hash 文件名)\n`);
 
-    await fs.ensureDir(dest);
+    await prepareAkigumo();
+
+    const waitingPrepOthers = spinner('准备其他内容');
     db = await createDatastore();
+    waitingPrepOthers.succeed();
 
     await exportPics('entities');
     await exportPics('equipments');
     await exportPics('ships');
     await exportPics('shipsExtra');
 
-    console.log(chalk.magentaBright('发布'));
+    logTitle('发布', 3);
     spinner(`总计 ${filesCount} 个文件`).succeed();
-    // TODO 操作 database repo
-    // TODO 操作 Akigumo repi
+    await compactNedb(db);
+    await updateRepo('Akigumo', dirAkigumo, 'Update images');
+    await updateRepo('Database', repoDatabase, 'Update image-maps');
 };
 
 module.exports = main;
 
+// ============================================================================
+//
+// Commons
+//
+// ============================================================================
+
+const spawn = async (cmd, options = {}) => {
+    const chunks = cmd.split(' ');
+    await new Promise((resolve, reject) => {
+        const child = require('child_process').spawn(chunks.shift(), chunks, {
+            stdio: 'inherit',
+            shell: true,
+            ...options
+        });
+        child.on('close', () => {
+            resolve();
+        });
+        child.on('error', (...args) => {
+            reject(...args);
+        });
+    }).catch(e => {
+        spinner(cmd).fail();
+        console.error(e);
+    });
+};
+
+const updateRepo = async (repoName, repoDir, commitMsg, branch = 'master') => {
+    const msg = `更新代码库: ${repoName}`;
+    const waiting = spinner(`${msg}...`);
+    const git = require('simple-git/promise')(repoDir);
+    await git.add('./*');
+    await git.commit(
+        `${commitMsg} - ${new Date().toLocaleString()} (Local time)`
+    );
+    // await git.push();
+    // waiting.succeed();
+    waiting.stop();
+    console.log(`  ${msg}`);
+    // * git clone
+    await spawn(`git push origin ${branch}`, {
+        cwd: repoDir
+    }).catch(e => {
+        spinner(msg).fail(e);
+    });
+    spinner(msg).succeed();
+};
+
+// ============================================================================
+//
+// Akigumo
+//
+// ============================================================================
+
+const prepareAkigumo = async () => {
+    const waitingPrepDir = spinner('准备代码库: Akigumo');
+    await prepareRepo('akigumo', dirAkigumo, ['--depth', '1']).catch(err => {
+        waitingPrepDir.fail(err);
+    });
+    destPics = require(path.resolve(dirAkigumo)).dirImages;
+    const thisGit = require('simple-git/promise')(dirAkigumo);
+    await thisGit.reset('hard');
+    await thisGit.clean('f');
+    await fs.remove(destPics);
+    waitingPrepDir.succeed();
+};
+
+// ============================================================================
+//
+// Pics
+//
 // ============================================================================
 
 const exportPics = async type => {
@@ -56,11 +134,16 @@ const exportPics = async type => {
         entities: {
             title: '声优 & 画师',
             getList: async () =>
-                await getListFromFolder('entities', [0, '0-1', '0-2', 2])
+                await getListFromFolder('entities', [
+                    0,
+                    // '0-1',
+                    // '0-2',
+                    2
+                ])
         }
     };
 
-    console.log(chalk.magentaBright(types[type].title));
+    logTitle(types[type].title, 3);
 
     const waitingGlob = spinner('确认文件列表');
     const list = await types[type].getList();
@@ -75,8 +158,9 @@ const exportPics = async type => {
                 const md5 = await md5File(value);
                 const ext = path.extname(value);
                 const md5Splitted = [md5.slice(0, 2), md5.slice(2)].join('/');
-                const newfile = path.resolve(dest, md5Splitted + ext);
-                map[id] = md5Splitted;
+                const newfile = path.resolve(destPics, md5Splitted + ext);
+                map[id] = md5;
+                // map[id] = md5Splitted;
                 files.push([value, newfile]);
             }
         }
@@ -95,7 +179,7 @@ const exportPics = async type => {
 
     const waitingWriteMap = spinner('写入对照表文件');
     filesCount += files.length;
-    const fileMap = path.resolve(dest, `map_${decamelize(type, '_')}.json`);
+    const fileMap = path.resolve(destMaps, `map_${decamelize(type, '_')}.json`);
     await fs.remove(fileMap);
     await fs.writeJson(fileMap, map);
     // await fs.writeJson(
@@ -134,11 +218,11 @@ const getListShips = async () => {
     const list = {};
     const filenames = [
         0,
-        '0-1',
-        '0-2',
+        // '0-1',
+        // '0-2',
         1,
-        '1-1',
-        '1-2',
+        // '1-1',
+        // '1-2',
         2,
         3,
         8,
