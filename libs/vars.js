@@ -7,7 +7,7 @@ const {
 } = require('kckit');
 
 module.exports = {
-    proxy: 'http://127.0.0.1:7890',
+    proxy: 'http://127.0.0.1:10807',
     // proxy: undefined,
 
     gameVersion: '4.5.4.1',
