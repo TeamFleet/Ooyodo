@@ -92,6 +92,7 @@ module.exports = async (onProgress, proxy = _proxy) => {
     const picsVersionsNew = {}; // 更新后的舰娘图片版本
     const downloadList = []; // 下载URL列表
     const apiStart2 = await fs.readJSON(fileApiStart2);
+    const linksBroken = [];
 
     if (
         typeof apiStart2 !== 'object' ||
@@ -298,11 +299,12 @@ module.exports = async (onProgress, proxy = _proxy) => {
                 `${type in typeFileName ? typeFileName[type] : type}.png`
             );
             const retryForNoTrail = async () => {
+                const urlNoTrail = getPicUrlShip(id, type, picsVersionsNew[id]);
                 await wait(1 * 1000);
-                await fetchFile(
-                    getPicUrlShip(id, type, picsVersionsNew[id]),
-                    pathname
-                ).catch(() => {});
+                await fetchFile(urlNoTrail, pathname).catch(() => {
+                    linksBroken.push(url);
+                    linksBroken.push(urlNoTrail);
+                });
             };
             downloadList.push({
                 id,
@@ -368,5 +370,9 @@ module.exports = async (onProgress, proxy = _proxy) => {
             // console.log(dir)
             await fs.remove(dir);
         }
+    }
+
+    for (const link of linksBroken) {
+        console.error(link);
     }
 };

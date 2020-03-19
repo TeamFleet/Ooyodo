@@ -54,7 +54,7 @@ module.exports = async (
             .then(onFetch)
             .catch(async err => {
                 if (err && typeof curr[`on${err}`]) {
-                    return await curr[`on${err}`];
+                    return await curr[`on${err}`]();
                 }
                 // if (err === 404) return await on404();
                 console.log(_url, err);
