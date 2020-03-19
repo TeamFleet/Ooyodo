@@ -302,8 +302,10 @@ module.exports = async (onProgress, proxy = _proxy) => {
                 const urlNoTrail = getPicUrlShip(id, type, picsVersionsNew[id]);
                 await wait(1 * 1000);
                 await fetchFile(urlNoTrail, pathname).catch(() => {
-                    linksBroken.push(url);
-                    linksBroken.push(urlNoTrail);
+                    if (type !== 'special') {
+                        linksBroken.push(url);
+                        linksBroken.push(urlNoTrail);
+                    }
                 });
             };
             downloadList.push({
