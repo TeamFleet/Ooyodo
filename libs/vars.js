@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const spinners = require('cli-spinners');
 const {
-    enemyIdStartFrom
+    enemyIdStartFrom,
     // enemyEquipmentIdStartFrom
 } = require('kckit');
 
@@ -38,7 +38,7 @@ module.exports = {
                 equipments: path.resolve(
                     process.cwd(),
                     './.fetched_data/pics/equipments'
-                )
+                ),
             },
             versions: {
                 ships: path.resolve(
@@ -48,8 +48,8 @@ module.exports = {
                 equipments: path.resolve(
                     process.cwd(),
                     './.fetched_data/pics/equipments_versions.json'
-                )
-            }
+                ),
+            },
         },
 
         repoPics: path.resolve(process.cwd(), './.repo_pics'),
@@ -77,9 +77,9 @@ module.exports = {
         apiStart2: path.resolve(
             process.cwd(),
             './.fetched_data/api_start2.json'
-        )
+        ),
     },
 
     strPaddingLength: 50,
-    strPaddingStr: '─'
+    strPaddingStr: '─',
 };
