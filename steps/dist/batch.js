@@ -1,59 +1,58 @@
-const fs = require('fs-extra')
-const path = require('path')
-const copyFiles = require('../../libs/commons/copy-files')
+const fs = require('fs-extra');
+const path = require('path');
+const copyFiles = require('../../libs/commons/copy-files');
 
-const dirs = require('./dirs')
+const dirs = require('./dirs');
 const {
-    pathname: {
-        repoPics
-    },
-} = require('../../libs/vars')
+    pathname: { repoPics },
+} = require('../../libs/vars');
 
 const getFolder = (type, category, id, group) => {
     switch (type) {
         case 'app': {
-            group = group ? `-${group}` : ''
+            group = group ? `-${group}` : '';
             if (category === 'equipments')
-                return path.resolve(dirs[type], `pics/items${group}`, '' + id)
-            return path.resolve(dirs[type], `pics-${category}${group}`, '' + id)
+                return path.resolve(dirs[type], `pics/items${group}`, '' + id);
+            return path.resolve(
+                dirs[type],
+                `pics-${category}${group}`,
+                '' + id
+            );
         }
         case 'webApp': {
             if (category === 'equipments')
-                return path.resolve(dirs[type], `pics/items`, '' + id)
+                return path.resolve(dirs[type], `pics/items`, '' + id);
             if (category === 'entities')
-                return path.resolve(dirs[type], `pics/entities`, '' + id)
-            return path.resolve(dirs[type], `pics-${category}`, '' + id)
+                return path.resolve(dirs[type], `pics/entities`, '' + id);
+            return path.resolve(dirs[type], `pics-${category}`, '' + id);
         }
-        case 'pwa': {
-            return path.resolve(dirs[type], `${category}`, '' + id)
-        }
+        // case 'pwa': {
+        //     return path.resolve(dirs[type], `${category}`, '' + id)
+        // }
     }
-    return path.resolve(dirs[type], `${category}`, '' + id)
-}
+    return path.resolve(dirs[type], `${category}`, '' + id);
+};
 
 module.exports = async (title, list = []) => {
+    const pairs = [];
 
-    const pairs = []
-
-    list.forEach(o => {
-        const {
+    list.forEach((o) => {
+        const { category, type, id, filename, group } = o;
+        const from = path.resolve(
+            repoPics,
+            'dist',
             category,
-            type,
-            id,
-            filename,
-            group,
-        } = o
-        const from = path.resolve(repoPics, 'dist', category, '' + id, '' + filename)
+            '' + id,
+            '' + filename
+        );
 
-        if (!fs.existsSync(from))
-            return
+        if (!fs.existsSync(from)) return;
 
-        const to = getFolder(type, category, id, group)
-        const dest = path.resolve(to, filename)
+        const to = getFolder(type, category, id, group);
+        const dest = path.resolve(to, filename);
 
-        pairs.push([from, dest])
-    })
+        pairs.push([from, dest]);
+    });
 
-    await copyFiles(pairs, title)
-
-}
+    await copyFiles(pairs, title);
+};
