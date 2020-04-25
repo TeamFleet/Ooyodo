@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs-extra');
-const md5File = require('md5-file');
+// const md5File = require('md5-file');
 
 const { enemyIdStartFrom, pathname, proxy: _proxy } = require('../vars');
 const batch = require('./batch');
@@ -26,7 +26,7 @@ const imgTypes = [
     'banner_dmg',
     'card',
     'card_dmg',
-    'special'
+    'special',
 ];
 // const imgTypesHoliday = [
 //     'full',
@@ -35,7 +35,7 @@ const imgTypes = [
 const imgTypesEnemy = [
     'full',
     // 'full_dmg',
-    'banner'
+    'banner',
     // 'banner_dmg',
 ];
 const typeFileName = {
@@ -46,7 +46,7 @@ const typeFileName = {
     full: 8,
     full_dmg: 9,
     remodel: 10,
-    remodel_dmg: 11
+    remodel_dmg: 11,
 };
 
 // http://203.104.209.23/kcs2/resources/ship/full/0406_6059.png?version=2
@@ -104,7 +104,7 @@ module.exports = async (onProgress, proxy = _proxy) => {
     }
 
     const {
-        api_data: { api_mst_ship: rawShips, api_mst_shipgraph: shipgraph }
+        api_data: { api_mst_ship: rawShips, api_mst_shipgraph: shipgraph },
     } = apiStart2;
 
     /* data examples
@@ -317,7 +317,7 @@ module.exports = async (onProgress, proxy = _proxy) => {
                 pathname,
                 version: picsVersionsNew[id],
                 on403: retryForNoTrail,
-                on404: retryForNoTrail
+                on404: retryForNoTrail,
             });
         }
 
@@ -365,9 +365,9 @@ module.exports = async (onProgress, proxy = _proxy) => {
     // 检查 extra 目录下的每个文件夹，如果发现有空目录，清除
     {
         const dirs = (await fs.readdir(dirPicsShipsExtra))
-            .map(filename => path.resolve(dirPicsShipsExtra, filename))
-            .filter(pathname => fs.lstatSync(pathname).isDirectory())
-            .filter(pathname => !fs.readdirSync(pathname).length);
+            .map((filename) => path.resolve(dirPicsShipsExtra, filename))
+            .filter((pathname) => fs.lstatSync(pathname).isDirectory())
+            .filter((pathname) => !fs.readdirSync(pathname).length);
         for (const dir of dirs) {
             // console.log(dir)
             await fs.remove(dir);

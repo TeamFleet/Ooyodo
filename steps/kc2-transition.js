@@ -10,7 +10,7 @@ const {
     db: data,
     pathname,
     enemyIdStartFrom,
-    enemyEquipmentIdStartFrom
+    enemyEquipmentIdStartFrom,
 } = require('../libs/vars');
 const confirmedSameAsPrev = require('../libs/ships-pic-same-as-prev');
 
@@ -39,11 +39,11 @@ module.exports = async () => {
     const db = await createDatastore();
 
     const shipIds = Object.keys(data.ships)
-        .filter(id => id < enemyIdStartFrom)
-        .map(id => parseInt(id));
+        .filter((id) => id < enemyIdStartFrom)
+        .map((id) => parseInt(id));
     const equipmentIds = Object.keys(data.equipments)
-        .filter(id => id < enemyEquipmentIdStartFrom)
-        .map(id => parseInt(id));
+        .filter((id) => id < enemyEquipmentIdStartFrom)
+        .map((id) => parseInt(id));
 
     stepPrepration.finish();
 
@@ -53,13 +53,13 @@ module.exports = async () => {
         const stepRemoveShipPics = spinner('删除 pics repo 中多余的图片');
         const remove = async (root, filesToRemove) => {
             const dirs = (await fs.readdir(root))
-                .filter(filename => {
+                .filter((filename) => {
                     const stats = fs.lstatSync(path.resolve(root, filename));
                     return stats.isDirectory();
                 })
-                .map(filename => parseInt(filename))
+                .map((filename) => parseInt(filename))
                 .sort((a, b) => a - b)
-                .map(id => path.resolve(root, '' + id));
+                .map((id) => path.resolve(root, '' + id));
             for (const dir of dirs) {
                 for (const filename of filesToRemove) {
                     const pathname = path.resolve(dir, filename);
@@ -105,7 +105,7 @@ module.exports = async () => {
             '13.png',
             '13.webp',
             '14.png',
-            '14.webp'
+            '14.webp',
         ]);
         await remove(path.resolve(pathname.repoPics, 'dist', 'ships-extra'), [
             '2.jpg',
@@ -115,11 +115,11 @@ module.exports = async () => {
             '3.png',
             '3.webp',
             '8.webp',
-            '9.webp'
+            '9.webp',
         ]);
         await remove(path.resolve(pathname.repoPics, 'dist', 'enemies'), [
             '0.jpg',
-            '1.png'
+            '1.png',
         ]);
         await remove(path.resolve(pathname.repoPics, 'dist', 'equipments'), [
             'card.webp',
@@ -130,7 +130,7 @@ module.exports = async () => {
             'item_up.png',
             'item_up.webp',
             'statustop_item.png',
-            'statustop_item.webp'
+            'statustop_item.webp',
         ]);
         // await remove(
         //     dirKC2ShipsExtra,
@@ -149,24 +149,24 @@ module.exports = async () => {
         const step = spinner('图片更名');
         const pairs = [
             ['6.png', '8.png'],
-            ['7.png', '9.png']
+            ['7.png', '9.png'],
         ];
-        const getDirs = async pathname => {
+        const getDirs = async (pathname) => {
             return (await fs.readdir(pathname))
-                .filter(filename => {
+                .filter((filename) => {
                     const stats = fs.lstatSync(
                         path.resolve(pathname, filename)
                     );
                     return stats.isDirectory();
                 })
-                .map(filename => parseInt(filename))
+                .map((filename) => parseInt(filename))
                 .sort((a, b) => a - b)
-                .map(id => path.resolve(pathname, '' + id));
+                .map((id) => path.resolve(pathname, '' + id));
         };
         const dirs = [
             ...(await getDirs(dirKC2Ships)),
             ...(await getDirs(dirKC2ShipsExtra)),
-            ...(await getDirs(dirKC2Enemies))
+            ...(await getDirs(dirKC2Enemies)),
         ];
         for (const dir of dirs) {
             for (const pair of pairs) {
@@ -190,11 +190,11 @@ module.exports = async () => {
             const update = {};
             if (picVersion) {
                 update['$set'] = {
-                    illust_version: picVersion
+                    illust_version: picVersion,
                 };
             } else {
                 update['$unset'] = {
-                    illust_version: true
+                    illust_version: true,
                 };
             }
             await db.ships.update({ id }, update);
@@ -208,13 +208,13 @@ module.exports = async () => {
     if (doCopyExtra) {
         const stepShipsCopyExtras = spinner('复制文件：extra');
         const dirs = (await fs.readdir(dirKC2ShipsExtra))
-            .filter(filename => {
+            .filter((filename) => {
                 const stats = fs.lstatSync(
                     path.resolve(dirKC2ShipsExtra, filename)
                 );
                 return stats.isDirectory();
             })
-            .map(filename => parseInt(filename))
+            .map((filename) => parseInt(filename))
             .sort((a, b) => a - b);
         const filesToCopy = [
             '0.png',
@@ -222,7 +222,7 @@ module.exports = async () => {
             '2.png',
             '3.png',
             '10.png',
-            '11.png'
+            '11.png',
         ];
         for (const id of dirs) {
             for (const filename of filesToCopy) {
@@ -261,21 +261,21 @@ module.exports = async () => {
                     if (value) {
                         return {
                             $set: {
-                                illust_same_as_prev: true
-                            }
+                                illust_same_as_prev: true,
+                            },
                         };
                     } else {
                         return {
                             $unset: {
-                                illust_same_as_prev: true
-                            }
+                                illust_same_as_prev: true,
+                            },
                         };
                     }
                 })()
             );
 
             const series = await db.shipSeries.findOne({ id: seriesId });
-            const ships = series.ships.map(ship => {
+            const ships = series.ships.map((ship) => {
                 if (ship.id == shipId) {
                     const newShip = Object.assign({}, ship);
                     if (value) {
@@ -291,7 +291,7 @@ module.exports = async () => {
             await db.shipSeries.update(
                 { id: series.id },
                 {
-                    $set: { ships }
+                    $set: { ships },
                 }
             );
         };
@@ -313,11 +313,7 @@ module.exports = async () => {
                             filename
                         );
                         if (fs.existsSync(pathname)) {
-                            thisHash += await new Promise(resolve => {
-                                md5File(pathname, (err, hash) => {
-                                    resolve(hash);
-                                });
-                            });
+                            thisHash += await md5File(pathname);
                             const stats = fs.lstatSync(pathname);
                             thisSize += stats.size;
                         }
@@ -352,11 +348,11 @@ module.exports = async () => {
             const update = {};
             if (picVersion) {
                 update['$set'] = {
-                    illust_version: picVersion
+                    illust_version: picVersion,
                 };
             } else {
                 update['$unset'] = {
-                    illust_version: true
+                    illust_version: true,
                 };
             }
             await db.equipments.update({ id }, update);
@@ -379,11 +375,11 @@ module.exports = async () => {
         const step = spinner('复制图片');
         const copy = async (from, dest, filesToCopy) => {
             const ids = (await fs.readdir(from))
-                .filter(filename => {
+                .filter((filename) => {
                     const stats = fs.lstatSync(path.resolve(from, filename));
                     return stats.isDirectory();
                 })
-                .map(filename => parseInt(filename))
+                .map((filename) => parseInt(filename))
                 .sort((a, b) => a - b);
 
             for (const id of ids) {
@@ -407,7 +403,7 @@ module.exports = async () => {
                 '3.png',
                 // '8.png', '9.png',
                 '10.png',
-                '11.png'
+                '11.png',
             ]
         );
         await copy(

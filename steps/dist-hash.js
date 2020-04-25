@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const decamelize = require('decamelize');
-const md5File = require('md5-file/promise');
+const md5File = require('md5-file');
 const glob = require('glob-promise');
 
 const createDatastore = require('../libs/commons/create-datastore');
@@ -10,7 +10,7 @@ const prepareRepo = require('../libs/commons/prepare-repo-dir');
 const logTitle = require('../libs/commons/log-title');
 const compactNedb = require('../libs/commons/compact-nedb');
 const {
-    pathname: { repoPics, repoDatabase, repoAkigumo }
+    pathname: { repoPics, repoDatabase, repoAkigumo },
 } = require('../libs/vars');
 const Clpr = require('../libs/clpr');
 
@@ -57,7 +57,7 @@ const spawn = async (cmd, options = {}) => {
         const child = require('child_process').spawn(chunks.shift(), chunks, {
             stdio: 'inherit',
             shell: true,
-            ...options
+            ...options,
         });
         child.on('close', () => {
             resolve();
@@ -65,7 +65,7 @@ const spawn = async (cmd, options = {}) => {
         child.on('error', (...args) => {
             reject(...args);
         });
-    }).catch(e => {
+    }).catch((e) => {
         spinner(cmd).fail();
         console.error(e);
     });
@@ -85,8 +85,8 @@ const updateRepo = async (repoName, repoDir, commitMsg, branch = 'master') => {
     console.log(`  ${msg}`);
     // * git clone
     await spawn(`git push origin ${branch}`, {
-        cwd: repoDir
-    }).catch(e => {
+        cwd: repoDir,
+    }).catch((e) => {
         spinner(msg).fail(e);
     });
     spinner(msg).succeed();
@@ -100,7 +100,7 @@ const updateRepo = async (repoName, repoDir, commitMsg, branch = 'master') => {
 
 const prepareAkigumo = async () => {
     const waitingPrepDir = spinner('准备代码库: Akigumo');
-    await prepareRepo('akigumo', dirAkigumo, ['--depth', '1']).catch(err => {
+    await prepareRepo('akigumo', dirAkigumo, ['--depth', '1']).catch((err) => {
         waitingPrepDir.fail(err);
     });
     destPics = require(path.resolve(dirAkigumo)).dirImages;
@@ -117,19 +117,20 @@ const prepareAkigumo = async () => {
 //
 // ============================================================================
 
-const exportPics = async type => {
+const exportPics = async (type) => {
     const types = {
         ships: {
             title: '舰娘',
-            getList: getListShips
+            getList: getListShips,
         },
         shipsExtra: {
             title: '舰娘限定图鉴',
-            getList: getListShipExtra
+            getList: getListShipExtra,
         },
         equipments: {
             title: '装备',
-            getList: async () => await getListFromFolder('equipments', ['card'])
+            getList: async () =>
+                await getListFromFolder('equipments', ['card']),
         },
         entities: {
             title: '声优 & 画师',
@@ -138,9 +139,9 @@ const exportPics = async type => {
                     0,
                     // '0-1',
                     // '0-2',
-                    2
-                ])
-        }
+                    2,
+                ]),
+        },
     };
 
     logTitle(types[type].title, 3);
@@ -173,7 +174,7 @@ const exportPics = async type => {
         promises: files.map(([file, newfile]) => async () => {
             await fs.ensureDir(path.dirname(newfile));
             await fs.copyFile(file, newfile);
-        })
+        }),
     });
     await progress.start();
 
@@ -200,8 +201,8 @@ const getListFromFolder = async (foldername, filenames) => {
         foldername,
         '**',
         `@(${filenames
-            .map(f => `${f}.png`)
-            .concat(filenames.map(f => `${f}.jpg`))
+            .map((f) => `${f}.png`)
+            .concat(filenames.map((f) => `${f}.jpg`))
             .join('|')})`
     );
     const files = await glob(globPattern);
@@ -229,14 +230,14 @@ const getListShips = async () => {
         9,
         10,
         11,
-        'special'
+        'special',
     ];
     const srcDist = path.resolve(repoPics, 'dist', 'ships');
     const ships = (await db.ships.find({})).reduce((o, ship) => {
         o[parseInt(ship.id)] = ship;
         return o;
     }, {});
-    const getPrevModel = ship =>
+    const getPrevModel = (ship) =>
         typeof ship.remodel === 'object' &&
         typeof ship.remodel.prev === 'number' &&
         typeof ships[ship.remodel.prev] === 'object' &&
@@ -266,10 +267,10 @@ const getListShipExtra = async () => {
     const filenames = [8, 9];
     const srcDist = path.resolve(repoPics, 'dist', 'ships-extra');
     const ids = (await fs.readdir(srcDist))
-        .filter(filename =>
+        .filter((filename) =>
             fs.lstatSync(path.resolve(srcDist, filename)).isDirectory()
         )
-        .map(filename => parseInt(filename));
+        .map((filename) => parseInt(filename));
 
     for (const id of ids) {
         const folder = path.resolve(srcDist, `${id}`);
@@ -281,8 +282,8 @@ const getListShipExtra = async () => {
                 // illust_extra
                 const result = await db.ships.find({
                     illust_extra: {
-                        $elemMatch: id
-                    }
+                        $elemMatch: id,
+                    },
                 });
                 if (result.length)
                     file = path.resolve(
