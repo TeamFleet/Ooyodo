@@ -7,7 +7,7 @@ const { pathname } = require('../vars');
 const repos = {
     pics: 'git@github.com:TeamFleet/WhoCallsTheFleet-Pics.git',
     database: 'git@github.com:TeamFleet/WhoCallsTheFleet-DB.git',
-    akigumo: 'git@github.com:TeamFleet/Akigumo.git'
+    akigumo: 'git@github.com:TeamFleet/Akigumo.git',
 };
 
 module.exports = async (type, dest, args) =>
@@ -68,7 +68,7 @@ module.exports = async (type, dest, args) =>
 
             thisGit.silent(true);
 
-            await thisGit.push('origin', 'master').catch(e => {
+            await thisGit.push('origin', 'master').catch((e) => {
                 err = e;
             });
 

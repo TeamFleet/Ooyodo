@@ -1,12 +1,12 @@
 const spinner = require('../libs/commons/spinner');
 
 const step = '准备代码库';
-const run = async type => {
+const run = async (type, args) => {
     const thisStep = step + ` (${type})`;
     const waiting = spinner(thisStep);
-    return require('../libs/commons/prepare-repo-dir')(type)
+    return require('../libs/commons/prepare-repo-dir')(type, undefined, args)
         .then(() => waiting.finish())
-        .catch(err => waiting.fail(thisStep + '\n  ' + (err.message || err)));
+        .catch((err) => waiting.fail(thisStep + '\n  ' + (err.message || err)));
 };
 
 /**
@@ -15,5 +15,5 @@ const run = async type => {
  */
 module.exports = async () => {
     await run('database');
-    await run('pics');
+    await run('pics', ['--depth', '1']);
 };
