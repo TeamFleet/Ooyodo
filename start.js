@@ -14,7 +14,7 @@ const run = async () => {
     let isDist = false;
     let isDistHash = false;
     const argvs = Array.isArray(argv._)
-        ? argv._.filter(arg => {
+        ? argv._.filter((arg) => {
               if (arg === 'only-download') {
                   isOnlyDownload = true;
                   return false;
@@ -46,9 +46,9 @@ const run = async () => {
         await require('./steps/ensure-directories')();
         await require('./steps/fetch-api-start2')(token);
 
-        if (!isOnlyDownload) {
-            await require('./steps/prepare-repositories')();
-        }
+        // if (!isOnlyDownload) {
+        await require('./steps/prepare-repositories')();
+        // }
 
         if (isDistHash) {
             console.log(' ');
