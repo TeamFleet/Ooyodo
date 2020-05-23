@@ -42,7 +42,7 @@ module.exports = async (
             version,
             ignore404 = false,
             onFetch = () => {},
-            onFail = () => {}
+            onFail = () => {},
             // on403 = () => {},
             // on404 = () => {}
         } = curr;
@@ -52,8 +52,8 @@ module.exports = async (
 
         await fetchFile(url.parse(_url), saveTo, proxy)
             .then(onFetch)
-            .catch(async err => {
-                if (err && typeof curr[`on${err}`]) {
+            .catch(async (err) => {
+                if (err && typeof curr[`on${err}`] === 'function') {
                     return await curr[`on${err}`]();
                 }
                 // if (err === 404) return await on404();
@@ -85,7 +85,7 @@ module.exports = async (
                 complete: status[id],
                 url: _url,
                 id: id,
-                name: name
+                name: name,
             });
 
         completeIndex++;
