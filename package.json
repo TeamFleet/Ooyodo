@@ -24,26 +24,26 @@
         "decamelize": "^4.0.0",
         "fs-extra": "^9.0.1",
         "glob-promise": "^3.4.0",
-        "kckit": "^1.49.0",
+        "kckit": "^1.50.0",
         "md5-file": "^5.0.0",
         "ncp": "^2.0.0",
         "nedb-promise": "^2.0.1",
         "ora": "^5.1.0",
         "progress": "^2.0.3",
         "request": "^2.88.2",
-        "simple-git": "^2.20.1",
-        "yargs": "^16.0.3"
+        "simple-git": "^2.21.0",
+        "yargs": "^16.1.0"
     },
     "devDependencies": {
         "babel-eslint": "^10.1.0",
-        "eslint": "^7.9.0",
+        "eslint": "^7.11.0",
         "eslint-config-koot": "^2.0.0",
         "husky": "^4.3.0",
-        "jest": "^26.4.2",
-        "lint-staged": "^10.4.0",
+        "jest": "^26.5.3",
+        "lint-staged": "^10.4.1",
         "prettier": "^2.1.2",
         "prettier-eslint": "^11.0.0",
-        "react": "^16.13.1"
+        "react": "^16.14.0"
     },
     "husky": {
         "hooks": {
