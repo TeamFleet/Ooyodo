@@ -293,7 +293,13 @@ module.exports = async (onProgress, proxy = _proxy) => {
         await fs.ensureDir(pathThisShip);
 
         for (const type of types) {
-            const url = getPicUrlShip(id, type, picsVersionsNew[id], [map[id]]);
+            const url = getPicUrlShip(
+                id,
+                type,
+                picsVersionsNew[id],
+                // [map[id]]
+                type === 'full' || type === 'full_dmg' ? [map[id]] : undefined
+            );
             const pathname = path.join(
                 pathThisShip,
                 `${type in typeFileName ? typeFileName[type] : type}.png`

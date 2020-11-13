@@ -15,7 +15,7 @@ const imgTypes = [
     'item_on',
     'item_character',
     'item_up',
-    'statustop_item'
+    'statustop_item',
 ];
 /*
 fetched_data
@@ -68,10 +68,10 @@ module.exports = async (onProgress, proxy) => {
     }
 
     const {
-        api_data: { api_mst_slotitem: slotitem }
+        api_data: { api_mst_slotitem: slotitem },
     } = apiStart2;
 
-    const equipments = slotitem.filter(obj => {
+    const equipments = slotitem.filter((obj) => {
         const id = parseInt(obj.api_id);
         if (id >= enemyEquipmentIdStartFrom) return false;
 
@@ -88,6 +88,8 @@ module.exports = async (onProgress, proxy) => {
         const pathThisEquipment = path.join(dirPicsEquipments, '' + id);
         const picVsersion = obj.api_version || undefined;
 
+        if (fs.existsSync(pathThisEquipment))
+            await fs.remove(pathThisEquipment);
         await fs.ensureDir(pathThisEquipment);
 
         for (const type of imgTypes) {
@@ -101,7 +103,7 @@ module.exports = async (onProgress, proxy) => {
                 type,
                 url,
                 pathname,
-                version: picsVersionsNew[id]
+                version: picsVersionsNew[id],
             });
         }
     }
