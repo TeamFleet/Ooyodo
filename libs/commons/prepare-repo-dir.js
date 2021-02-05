@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const git = require('simple-git/promise');
+const debug = require('debug');
 
 const { pathname } = require('../vars');
 
@@ -66,13 +67,15 @@ module.exports = async (type, dest, args) =>
         const hasGitAccess = await (async () => {
             let err;
 
-            thisGit.silent(true);
+            // thisGit.silent(true);
+            debug.disable();
 
             await thisGit.push('origin', 'master').catch((e) => {
                 err = e;
             });
 
-            thisGit.silent(false);
+            debug.enable();
+            // thisGit.silent(false);
 
             if (err instanceof Error) err = err.message;
             if (typeof err === 'string')
