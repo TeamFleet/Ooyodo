@@ -33,6 +33,13 @@ module.exports = async (type, dest, args) =>
             exist = false;
         }
 
+        // console.log({
+        //     dir,
+        //     dest,
+        //     type,
+        //     pathname,
+        //     typeName: `repo` + type.substr(0, 1).toUpperCase() + type.substr(1),
+        // });
         fs.ensureDirSync(dir);
 
         const isRepo =
