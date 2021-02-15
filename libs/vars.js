@@ -60,7 +60,7 @@ module.exports = {
             );
             if (fs.existsSync(pathFromParentFolder))
                 return pathFromParentFolder;
-            path.resolve(process.cwd(), './.repo_database');
+            return path.resolve(process.cwd(), './.repo_database');
         })(),
         repoAkigumo: (() => {
             const pathFromParentFolder = path.resolve(
