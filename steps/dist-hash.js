@@ -103,7 +103,8 @@ const prepareAkigumo = async () => {
     await prepareRepo('akigumo', dirAkigumo, ['--depth', '1']).catch((err) => {
         waitingPrepDir.fail(err);
     });
-    destPics = require(path.resolve(dirAkigumo)).dirImages;
+    const akigumo = require(path.resolve(dirAkigumo, 'index.js'));
+    destPics = akigumo.dirImages;
     const thisGit = require('simple-git/promise')(dirAkigumo);
     await thisGit.reset('hard');
     await thisGit.clean('f');
