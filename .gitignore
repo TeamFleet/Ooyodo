@@ -64,3 +64,4 @@ typings/
 /.kc2
 /.dist-*
 /.dist/
+/.husky
