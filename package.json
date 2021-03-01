@@ -18,7 +18,6 @@
         "dist": "node start.js -- dist",
         "dist-hash": "node start.js -- dist-hash",
         "test": "jest",
-        "postinstall": "husky install",
         "up": "yarn upgrade-interactive --latest",
         "prepare": "husky install"
     },
