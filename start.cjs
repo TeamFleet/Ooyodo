@@ -38,7 +38,7 @@ const run = async () => {
 
     await (async () => {
         if (isDist) {
-            await require('./steps/dist.cjs')();
+            await require('./steps/dist/index.cjs')();
             return;
         }
 
