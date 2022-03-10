@@ -24,9 +24,9 @@
     },
     "dependencies": {
         "decamelize": "^5.0.0",
-        "fs-extra": "^10.0.0",
+        "fs-extra": "^10.0.1",
         "glob-promise": "^4.2.2",
-        "kckit": "^1.77.0",
+        "kckit": "^1.78.0",
         "md5-file": "^5.0.0",
         "ncp": "^2.0.0",
         "nedb-promise": "^2.0.1",
@@ -41,8 +41,8 @@
         "eslint": "^7.32.0",
         "eslint-config-koot": "^3.1.1",
         "husky": "^7.0.4",
-        "jest": "^27.5.0",
-        "lint-staged": "^12.3.3",
+        "jest": "^27.5.1",
+        "lint-staged": "^12.3.5",
         "prettier": "^2.5.1",
         "prettier-eslint": "^13.0.0",
         "react": "^17.0.2"
