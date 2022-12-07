@@ -9,7 +9,7 @@ const zeroPadding = require('./zero-padding.cjs');
  * @returns {String} 图片URL
  */
 module.exports = (equipmentId, picType, picVersion) =>
-    getPicUrl('equipment', zeroPadding(equipmentId, 3), picType, picVersion);
+    getPicUrl('equipment', zeroPadding(equipmentId, 4), picType, picVersion);
 
 /*
 可用图片类型
