@@ -17,7 +17,7 @@ module.exports = {
     spinner: spinners.dots,
 
     enemyIdStartFrom,
-    enemyEquipmentIdStartFrom: 500,
+    enemyEquipmentIdStartFrom: 600,
 
     pathname: {
         fetchedData: path.resolve(process.cwd(), './.fetched_data'),
